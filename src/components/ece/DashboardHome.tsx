@@ -1,4 +1,4 @@
-import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight, Cpu } from "lucide-react";
+import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight, Cpu, CircuitBoard } from "lucide-react";
 import type { LabSection } from "./LabLayout";
 import heroBg from "@/assets/hero-bg.png";
 
@@ -66,6 +66,16 @@ const features = [
     borderColor: "border-chart-3/30",
     iconColor: "text-chart-3",
     glowClass: "",
+  },
+  {
+    id: "digital" as LabSection,
+    title: "Digital Electronics Lab",
+    desc: "Logic gates, K-Maps, flip-flops, boolean algebra & number systems",
+    icon: <CircuitBoard size={24} />,
+    gradient: "from-chart-2/20 to-chart-2/5",
+    borderColor: "border-chart-2/30",
+    iconColor: "text-chart-2",
+    glowClass: "box-glow-cyan",
   },
 ];
 
