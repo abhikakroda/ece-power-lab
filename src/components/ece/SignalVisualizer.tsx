@@ -226,7 +226,8 @@ const SignalVisualizer = () => {
   const chartStyle = {
     grid: "hsl(var(--border))",
     tick: "hsl(var(--muted-foreground))",
-    tooltip: { background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" },
+    tickStyle: { fill: "hsl(var(--muted-foreground))", fontSize: 12 },
+    tooltip: { background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", fontSize: 13 },
   };
 
   return (
@@ -236,7 +237,7 @@ const SignalVisualizer = () => {
           <Radio size={20} className="text-secondary" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Signal Visualizer</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Signal Visualizer</h2>
           <p className="text-sm text-muted-foreground font-mono">Time Domain • Fourier Spectrum • Harmonic Analysis</p>
         </div>
       </div>
@@ -256,7 +257,7 @@ const SignalVisualizer = () => {
       <div className="flex items-center gap-2">
         {(["time", "fourier", "both"] as ViewMode[]).map(m => (
           <button key={m} onClick={() => setViewMode(m)}
-            className={cn("px-3 py-1.5 rounded-lg text-xs font-mono border transition-all",
+            className={cn("px-4 py-2 rounded-lg text-sm font-mono border transition-all",
               viewMode === m ? "bg-primary/15 border-primary/40 text-primary" : "border-border text-muted-foreground"
             )}>
             {m === "time" ? "⏱ Time Domain" : m === "fourier" ? "📊 Frequency Domain" : "⚡ Both Domains"}
@@ -267,24 +268,24 @@ const SignalVisualizer = () => {
       {/* Parameters */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-5 rounded-xl bg-card border border-border oscilloscope-border">
         <div>
-          <Label className="text-xs text-muted-foreground">Amplitude (A)</Label>
-          <Input type="number" value={amplitude} onChange={(e) => setAmplitude(parseFloat(e.target.value) || 1)} className="font-mono bg-muted border-border text-foreground mt-1" step="0.1" />
+          <Label className="text-sm text-muted-foreground">Amplitude (A)</Label>
+          <Input type="number" value={amplitude} onChange={(e) => setAmplitude(parseFloat(e.target.value) || 1)} className="font-mono bg-muted border-border text-foreground mt-1.5 text-base" step="0.1" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Frequency (Hz)</Label>
-          <Input type="number" value={frequency} onChange={(e) => setFrequency(parseFloat(e.target.value) || 1)} className="font-mono bg-muted border-border text-foreground mt-1" step="0.1" />
+          <Label className="text-sm text-muted-foreground">Frequency (Hz)</Label>
+          <Input type="number" value={frequency} onChange={(e) => setFrequency(parseFloat(e.target.value) || 1)} className="font-mono bg-muted border-border text-foreground mt-1.5 text-base" step="0.1" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Phase (rad)</Label>
-          <Input type="number" value={phase} onChange={(e) => setPhase(parseFloat(e.target.value) || 0)} className="font-mono bg-muted border-border text-foreground mt-1" step="0.1" />
+          <Label className="text-sm text-muted-foreground">Phase (rad)</Label>
+          <Input type="number" value={phase} onChange={(e) => setPhase(parseFloat(e.target.value) || 0)} className="font-mono bg-muted border-border text-foreground mt-1.5 text-base" step="0.1" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Time Shift</Label>
-          <Input type="number" value={timeShift} onChange={(e) => setTimeShift(parseFloat(e.target.value) || 0)} className="font-mono bg-muted border-border text-foreground mt-1" step="0.1" />
+          <Label className="text-sm text-muted-foreground">Time Shift</Label>
+          <Input type="number" value={timeShift} onChange={(e) => setTimeShift(parseFloat(e.target.value) || 0)} className="font-mono bg-muted border-border text-foreground mt-1.5 text-base" step="0.1" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Harmonics (N)</Label>
-          <Input type="number" value={numHarmonics} onChange={(e) => setNumHarmonics(Math.max(1, Math.min(50, parseInt(e.target.value) || 10)))} className="font-mono bg-muted border-border text-foreground mt-1" min={1} max={50} />
+          <Label className="text-sm text-muted-foreground">Harmonics (N)</Label>
+          <Input type="number" value={numHarmonics} onChange={(e) => setNumHarmonics(Math.max(1, Math.min(50, parseInt(e.target.value) || 10)))} className="font-mono bg-muted border-border text-foreground mt-1.5 text-base" min={1} max={50} />
         </div>
       </div>
 
@@ -302,12 +303,12 @@ const SignalVisualizer = () => {
       {/* ═══════ TIME DOMAIN ═══════ */}
       {(viewMode === "time" || viewMode === "both") && (
         <div className="p-5 rounded-xl bg-card border border-border oscilloscope-border animate-fade-in">
-          <h3 className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">📡 TIME DOMAIN — x(t)</h3>
-          <ResponsiveContainer width="100%" height={320}>
-            <LineChart data={data}>
+          <h3 className="text-sm font-mono text-muted-foreground mb-3 uppercase tracking-wider">📡 TIME DOMAIN — x(t)</h3>
+          <ResponsiveContainer width="100%" height={340}>
+            <LineChart data={data} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
-              <XAxis dataKey="t" tick={{ fill: chartStyle.tick, fontSize: 10 }} label={{ value: "Time (s)", position: "bottom", fill: chartStyle.tick, fontSize: 11 }} />
-              <YAxis tick={{ fill: chartStyle.tick, fontSize: 10 }} />
+              <XAxis dataKey="t" tick={{ fill: chartStyle.tick, fontSize: 12 }} label={{ value: "Time (s)", position: "bottom", fill: chartStyle.tick, fontSize: 13, offset: 10 }} />
+              <YAxis tick={{ fill: chartStyle.tick, fontSize: 12 }} width={50} />
               <Tooltip contentStyle={chartStyle.tooltip} />
               <Legend />
               {showOriginal && (
@@ -322,21 +323,21 @@ const SignalVisualizer = () => {
       {/* ═══════ FOURIER RECONSTRUCTION ═══════ */}
       {showReconstruction && reconstructionData && (viewMode === "time" || viewMode === "both") && (
         <div className="p-5 rounded-xl bg-card border border-chart-3/30 animate-fade-in">
-          <h3 className="text-xs font-mono text-chart-3 mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-mono text-chart-3 mb-3 uppercase tracking-wider">
             🔄 FOURIER RECONSTRUCTION — {numHarmonics} harmonics
           </h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={reconstructionData}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={reconstructionData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
-              <XAxis dataKey="t" tick={{ fill: chartStyle.tick, fontSize: 10 }} />
-              <YAxis tick={{ fill: chartStyle.tick, fontSize: 10 }} />
+              <XAxis dataKey="t" tick={{ fill: chartStyle.tick, fontSize: 12 }} />
+              <YAxis tick={{ fill: chartStyle.tick, fontSize: 12 }} width={50} />
               <Tooltip contentStyle={chartStyle.tooltip} />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 13 }} />
               <Line type="monotone" dataKey="original" stroke="hsl(var(--muted-foreground))" strokeWidth={1} strokeDasharray="4 4" dot={false} name="Original" />
               <Line type="monotone" dataKey="reconstructed" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} name={`Fourier (${numHarmonics} terms)`} />
             </LineChart>
           </ResponsiveContainer>
-          <div className="mt-2 text-[10px] font-mono text-muted-foreground">
+          <div className="mt-3 text-xs font-mono text-muted-foreground">
             <span className="text-chart-3">Gibbs phenomenon:</span> ~9% overshoot at discontinuities persists regardless of N. Visible in square/sawtooth waves.
           </div>
         </div>
@@ -347,12 +348,12 @@ const SignalVisualizer = () => {
         <div className="space-y-4 animate-fade-in">
           {/* Magnitude Spectrum */}
           <div className="p-5 rounded-xl bg-card border border-border oscilloscope-border">
-            <h3 className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">📊 MAGNITUDE SPECTRUM |X(f)|</h3>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={dftResult.magnitude.slice(0, Math.min(60, dftResult.magnitude.length))}>
+            <h3 className="text-sm font-mono text-muted-foreground mb-3 uppercase tracking-wider">📊 MAGNITUDE SPECTRUM |X(f)|</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={dftResult.magnitude.slice(0, Math.min(60, dftResult.magnitude.length))} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
-                <XAxis dataKey="freq" tick={{ fill: chartStyle.tick, fontSize: 9 }} label={{ value: "Frequency (Hz)", position: "bottom", fill: chartStyle.tick, fontSize: 11 }} />
-                <YAxis tick={{ fill: chartStyle.tick, fontSize: 10 }} />
+                <XAxis dataKey="freq" tick={{ fill: chartStyle.tick, fontSize: 12 }} label={{ value: "Frequency (Hz)", position: "bottom", fill: chartStyle.tick, fontSize: 13, offset: 10 }} />
+                <YAxis tick={{ fill: chartStyle.tick, fontSize: 12 }} width={50} />
                 <Tooltip contentStyle={chartStyle.tooltip} formatter={(v: number) => [v.toFixed(4), "|X(f)|"]} />
                 <Bar dataKey="mag" fill="hsl(var(--chart-2))" radius={[2, 2, 0, 0]} />
               </BarChart>
@@ -361,12 +362,12 @@ const SignalVisualizer = () => {
 
           {/* Phase Spectrum */}
           <div className="p-5 rounded-xl bg-card border border-border">
-            <h3 className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">📐 PHASE SPECTRUM ∠X(f)</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={dftResult.magnitude.slice(0, Math.min(60, dftResult.magnitude.length))}>
+            <h3 className="text-sm font-mono text-muted-foreground mb-3 uppercase tracking-wider">📐 PHASE SPECTRUM ∠X(f)</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={dftResult.magnitude.slice(0, Math.min(60, dftResult.magnitude.length))} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
-                <XAxis dataKey="freq" tick={{ fill: chartStyle.tick, fontSize: 9 }} />
-                <YAxis tick={{ fill: chartStyle.tick, fontSize: 10 }} domain={[-Math.PI, Math.PI]} />
+                <XAxis dataKey="freq" tick={{ fill: chartStyle.tick, fontSize: 12 }} />
+                <YAxis tick={{ fill: chartStyle.tick, fontSize: 12 }} width={50} domain={[-Math.PI, Math.PI]} />
                 <Tooltip contentStyle={chartStyle.tooltip} formatter={(v: number) => [`${v.toFixed(3)} rad`, "Phase"]} />
                 <Line type="monotone" dataKey="phase" stroke="hsl(var(--chart-4))" strokeWidth={1.5} dot={false} />
               </LineChart>
@@ -376,12 +377,12 @@ const SignalVisualizer = () => {
           {/* Dominant frequencies */}
           {dftResult.dominant.length > 0 && (
             <div className="p-4 rounded-xl bg-card border border-chart-2/30">
-              <h3 className="text-xs font-mono text-chart-2 mb-2 uppercase tracking-wider">🎯 DOMINANT FREQUENCIES</h3>
-              <div className="flex gap-2 flex-wrap">
+              <h3 className="text-sm font-mono text-chart-2 mb-2 uppercase tracking-wider">🎯 DOMINANT FREQUENCIES</h3>
+              <div className="flex gap-3 flex-wrap">
                 {dftResult.dominant.map((d, i) => (
-                  <div key={i} className="px-3 py-2 rounded-lg bg-chart-2/10 border border-chart-2/20">
-                    <div className="text-sm font-mono font-bold text-chart-2">{d.freq.toFixed(2)} Hz</div>
-                    <div className="text-[9px] font-mono text-muted-foreground">|X| = {d.mag.toFixed(4)}</div>
+                  <div key={i} className="px-4 py-3 rounded-lg bg-chart-2/10 border border-chart-2/20">
+                    <div className="text-base font-mono font-bold text-chart-2">{d.freq.toFixed(2)} Hz</div>
+                    <div className="text-xs font-mono text-muted-foreground">|X| = {d.mag.toFixed(4)}</div>
                   </div>
                 ))}
               </div>
@@ -392,17 +393,17 @@ const SignalVisualizer = () => {
 
       {/* ═══════ FOURIER SERIES COEFFICIENTS ═══════ */}
       <div className="p-5 rounded-xl bg-card border border-border animate-fade-in">
-        <h3 className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">
+        <h3 className="text-sm font-mono text-muted-foreground mb-3 uppercase tracking-wider">
           📐 FOURIER SERIES COEFFICIENTS — {signalType.toUpperCase()} WAVE
         </h3>
 
         {/* Coefficient bar chart */}
         <div className="mb-4">
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={fourierCoeffs.filter(c => c.n > 0)}>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={fourierCoeffs.filter(c => c.n > 0)} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
-              <XAxis dataKey="n" tick={{ fill: chartStyle.tick, fontSize: 10 }} label={{ value: "Harmonic n", position: "bottom", fill: chartStyle.tick, fontSize: 11 }} />
-              <YAxis tick={{ fill: chartStyle.tick, fontSize: 10 }} />
+              <XAxis dataKey="n" tick={{ fill: chartStyle.tick, fontSize: 12 }} label={{ value: "Harmonic n", position: "bottom", fill: chartStyle.tick, fontSize: 13, offset: 10 }} />
+              <YAxis tick={{ fill: chartStyle.tick, fontSize: 12 }} width={50} />
               <Tooltip contentStyle={chartStyle.tooltip} />
               <Bar dataKey="cn" fill="hsl(var(--primary))" name="|cₙ|" radius={[2, 2, 0, 0]} />
             </BarChart>
@@ -411,26 +412,26 @@ const SignalVisualizer = () => {
 
         {/* Coefficient table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-[10px] font-mono">
+          <table className="w-full text-sm font-mono">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-1.5 px-2 text-left text-muted-foreground">n</th>
-                <th className="py-1.5 px-2 text-right text-chart-2">aₙ (cos)</th>
-                <th className="py-1.5 px-2 text-right text-chart-3">bₙ (sin)</th>
-                <th className="py-1.5 px-2 text-right text-primary">|cₙ|</th>
-                <th className="py-1.5 px-2 text-right text-chart-4">φₙ (rad)</th>
-                <th className="py-1.5 px-2 text-right text-muted-foreground">freq (Hz)</th>
+                <th className="py-2 px-3 text-left text-muted-foreground">n</th>
+                <th className="py-2 px-3 text-right text-chart-2">aₙ (cos)</th>
+                <th className="py-2 px-3 text-right text-chart-3">bₙ (sin)</th>
+                <th className="py-2 px-3 text-right text-primary">|cₙ|</th>
+                <th className="py-2 px-3 text-right text-chart-4">φₙ (rad)</th>
+                <th className="py-2 px-3 text-right text-muted-foreground">freq (Hz)</th>
               </tr>
             </thead>
             <tbody>
               {fourierCoeffs.slice(0, 16).map(c => (
                 <tr key={c.n} className={cn("border-b border-border/30", c.cn > 0.01 ? "bg-primary/5" : "")}>
-                  <td className="py-1 px-2 text-muted-foreground">{c.n === 0 ? "DC" : c.n}</td>
-                  <td className={cn("py-1 px-2 text-right", Math.abs(c.an) > 0.001 ? "text-chart-2 font-bold" : "text-muted-foreground/50")}>{c.an.toFixed(4)}</td>
-                  <td className={cn("py-1 px-2 text-right", Math.abs(c.bn) > 0.001 ? "text-chart-3 font-bold" : "text-muted-foreground/50")}>{c.bn.toFixed(4)}</td>
-                  <td className={cn("py-1 px-2 text-right", c.cn > 0.001 ? "text-primary font-bold" : "text-muted-foreground/50")}>{c.cn.toFixed(4)}</td>
-                  <td className="py-1 px-2 text-right text-chart-4">{c.phaseN.toFixed(3)}</td>
-                  <td className="py-1 px-2 text-right text-muted-foreground">{(c.n * frequency).toFixed(2)}</td>
+                  <td className="py-1.5 px-3 text-muted-foreground">{c.n === 0 ? "DC" : c.n}</td>
+                  <td className={cn("py-1.5 px-3 text-right", Math.abs(c.an) > 0.001 ? "text-chart-2 font-bold" : "text-muted-foreground/50")}>{c.an.toFixed(4)}</td>
+                  <td className={cn("py-1.5 px-3 text-right", Math.abs(c.bn) > 0.001 ? "text-chart-3 font-bold" : "text-muted-foreground/50")}>{c.bn.toFixed(4)}</td>
+                  <td className={cn("py-1.5 px-3 text-right", c.cn > 0.001 ? "text-primary font-bold" : "text-muted-foreground/50")}>{c.cn.toFixed(4)}</td>
+                  <td className="py-1.5 px-3 text-right text-chart-4">{c.phaseN.toFixed(3)}</td>
+                  <td className="py-1.5 px-3 text-right text-muted-foreground">{(c.n * frequency).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -439,12 +440,12 @@ const SignalVisualizer = () => {
       </div>
 
       {/* ═══════ FOURIER SERIES EXPRESSION ═══════ */}
-      <div className="p-4 rounded-xl bg-card border border-primary/20">
-        <div className="text-[10px] font-mono text-primary mb-1 uppercase">FOURIER SERIES EXPRESSION</div>
-        <div className="text-xs font-mono text-foreground break-all leading-relaxed">
+      <div className="p-5 rounded-xl bg-card border border-primary/20">
+        <div className="text-xs font-mono text-primary mb-1.5 uppercase">FOURIER SERIES EXPRESSION</div>
+        <div className="text-sm font-mono text-foreground break-all leading-relaxed">
           x(t) ≈ {fourierExpr}
         </div>
-        <div className="text-[9px] font-mono text-muted-foreground mt-2">
+        <div className="text-xs font-mono text-muted-foreground mt-2">
           ω = 2π × {frequency} = {(2 * Math.PI * frequency).toFixed(4)} rad/s | T = {(1 / frequency).toFixed(4)}s | N = {numHarmonics} harmonics
         </div>
       </div>
@@ -452,8 +453,8 @@ const SignalVisualizer = () => {
       {/* ═══════ THEORY PANEL ═══════ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-[10px] font-mono text-chart-2 mb-2 uppercase font-bold">FOURIER SERIES PROPERTIES</div>
-          <div className="space-y-1.5 text-[10px] font-mono text-muted-foreground">
+          <div className="text-xs font-mono text-chart-2 mb-2 uppercase font-bold">FOURIER SERIES PROPERTIES</div>
+          <div className="space-y-2 text-sm font-mono text-muted-foreground">
             <div>• <span className="text-chart-2">Even functions</span> → only cosine terms (aₙ ≠ 0, bₙ = 0)</div>
             <div>• <span className="text-chart-3">Odd functions</span> → only sine terms (aₙ = 0, bₙ ≠ 0)</div>
             <div>• <span className="text-primary">Half-wave symmetry</span> → only odd harmonics</div>
@@ -462,9 +463,9 @@ const SignalVisualizer = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="text-[10px] font-mono text-primary mb-2 uppercase font-bold">SIGNAL ANALYSIS: {signalType.toUpperCase()}</div>
-          <div className="space-y-1.5 text-[10px] font-mono text-muted-foreground">
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <div className="text-xs font-mono text-primary mb-2 uppercase font-bold">SIGNAL ANALYSIS: {signalType.toUpperCase()}</div>
+          <div className="space-y-2 text-sm font-mono text-muted-foreground">
             {signalType === "square" && <>
               <div>• Only <span className="text-primary">odd harmonics</span>: 1, 3, 5, 7...</div>
               <div>• Coefficients decay as <span className="text-chart-2">1/n</span></div>

@@ -84,11 +84,11 @@ const CircuitSolver = () => {
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-          <Zap size={20} className="text-primary" />
+        <div className="w-11 h-11 rounded-lg bg-primary/20 flex items-center justify-center">
+          <Zap size={22} className="text-primary" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Series RLC Circuit Solver</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Series RLC Circuit Solver</h2>
           <p className="text-sm text-muted-foreground font-mono">Impedance • Phasors • Frequency Response</p>
         </div>
       </div>
@@ -103,26 +103,26 @@ const CircuitSolver = () => {
           { key: "f" as const, label: "Frequency (Hz)", val: params.f },
         ].map((p) => (
           <div key={p.key}>
-            <Label className="text-xs text-muted-foreground">{p.label}</Label>
+            <Label className="text-sm text-muted-foreground">{p.label}</Label>
             <Input
               type="number"
               value={p.val}
               onChange={(e) => update(p.key, e.target.value)}
-              className="font-mono bg-muted border-border text-foreground mt-1"
+              className="font-mono bg-muted border-border text-foreground mt-1.5 text-base"
               step="any"
             />
           </div>
         ))}
       </div>
 
-      <Button onClick={() => setSolved(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono">
+      <Button onClick={() => setSolved(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-base px-6 py-2.5">
         ⚡ SOLVE CIRCUIT
       </Button>
 
       {solved && (
         <div className="space-y-8 animate-fade-in">
           {/* Results Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: "Impedance Z", value: `${results.Z.toFixed(2)} Ω`, color: "text-primary" },
               { label: "Current I", value: `${(results.I * 1000).toFixed(2)} mA`, color: "text-secondary" },
@@ -137,47 +137,47 @@ const CircuitSolver = () => {
               { label: "V_C", value: `${results.VC.toFixed(3)} V`, color: "text-accent" },
               { label: "Circuit", value: results.XL > results.XC ? "Inductive" : results.XL < results.XC ? "Capacitive" : "Resonance", color: "text-chart-4" },
             ].map((r) => (
-              <div key={r.label} className="p-3 rounded-lg bg-card border border-border">
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{r.label}</div>
-                <div className={`text-lg font-mono font-bold ${r.color}`}>{r.value}</div>
+              <div key={r.label} className="p-4 rounded-lg bg-card border border-border">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{r.label}</div>
+                <div className={`text-xl font-mono font-bold ${r.color}`}>{r.value}</div>
               </div>
             ))}
           </div>
 
           {/* Waveform */}
           <div className="p-6 rounded-xl bg-card border border-border oscilloscope-border">
-            <h3 className="text-sm font-semibold text-foreground mb-4 font-mono">⏱ VOLTAGE & CURRENT WAVEFORM</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={waveformData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 15% 16%)" />
-                <XAxis dataKey="time" tick={{ fill: "hsl(220 10% 50%)", fontSize: 10 }} label={{ value: "Time (ms)", position: "bottom", fill: "hsl(220 10% 50%)" }} />
-                <YAxis tick={{ fill: "hsl(220 10% 50%)", fontSize: 10 }} />
-                <Tooltip contentStyle={{ background: "hsl(220 20% 9%)", border: "1px solid hsl(220 15% 16%)", color: "hsl(140 20% 88%)" }} />
-                <Legend />
-                <Line type="monotone" dataKey="voltage" stroke="hsl(142 100% 45%)" strokeWidth={2} dot={false} name="Voltage (V)" />
-                <Line type="monotone" dataKey="current" stroke="hsl(187 80% 42%)" strokeWidth={2} dot={false} name="Current (×100 mA)" />
+            <h3 className="text-base font-semibold text-foreground mb-4 font-mono">⏱ VOLTAGE & CURRENT WAVEFORM</h3>
+            <ResponsiveContainer width="100%" height={340}>
+              <LineChart data={waveformData} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="time" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} label={{ value: "Time (ms)", position: "bottom", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: 10 }} />
+                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={50} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", fontSize: 13 }} />
+                <Legend wrapperStyle={{ fontSize: 13, paddingTop: 8 }} />
+                <Line type="monotone" dataKey="voltage" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Voltage (V)" />
+                <Line type="monotone" dataKey="current" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} name="Current (×100 mA)" />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Frequency Response */}
           <div className="p-6 rounded-xl bg-card border border-border oscilloscope-border">
-            <h3 className="text-sm font-semibold text-foreground mb-4 font-mono">📊 FREQUENCY RESPONSE</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={freqResponse}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 15% 16%)" />
-                <XAxis dataKey="freq" tick={{ fill: "hsl(220 10% 50%)", fontSize: 10 }} label={{ value: "Frequency (Hz)", position: "bottom", fill: "hsl(220 10% 50%)" }} />
-                <YAxis tick={{ fill: "hsl(220 10% 50%)", fontSize: 10 }} label={{ value: "Gain (dB)", angle: -90, position: "insideLeft", fill: "hsl(220 10% 50%)" }} />
-                <Tooltip contentStyle={{ background: "hsl(220 20% 9%)", border: "1px solid hsl(220 15% 16%)", color: "hsl(140 20% 88%)" }} />
-                <Line type="monotone" dataKey="gain" stroke="hsl(38 90% 55%)" strokeWidth={2} dot={false} name="Gain (dB)" />
+            <h3 className="text-base font-semibold text-foreground mb-4 font-mono">📊 FREQUENCY RESPONSE</h3>
+            <ResponsiveContainer width="100%" height={340}>
+              <LineChart data={freqResponse} margin={{ top: 10, right: 20, bottom: 25, left: 15 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="freq" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} label={{ value: "Frequency (Hz)", position: "bottom", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: 10 }} />
+                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={55} label={{ value: "Gain (dB)", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: -5 }} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", fontSize: 13 }} />
+                <Line type="monotone" dataKey="gain" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} name="Gain (dB)" />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Key Formulas */}
           <div className="p-6 rounded-xl bg-card border border-border">
-            <h3 className="text-sm font-semibold text-foreground mb-3 font-mono">📐 FORMULAS USED</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm font-mono text-muted-foreground">
+            <h3 className="text-base font-semibold text-foreground mb-4 font-mono">📐 FORMULAS USED</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-mono text-muted-foreground">
               <div>Z = √(R² + (X_L - X_C)²)</div>
               <div>X_L = 2πfL, X_C = 1/(2πfC)</div>
               <div>I = V/Z</div>

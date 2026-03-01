@@ -108,33 +108,33 @@ const InterviewMode = () => {
                 className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30 transition-colors"
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-xs font-mono ${difficultyColors[q.difficulty]}`}>[{q.difficulty}]</span>
-                    <span className="text-xs text-muted-foreground font-mono">Q{idx + 1}</span>
+                 <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-sm font-mono ${difficultyColors[q.difficulty]}`}>[{q.difficulty}]</span>
+                    <span className="text-sm text-muted-foreground font-mono">Q{idx + 1}</span>
                   </div>
-                  <div className="text-sm font-medium text-foreground">{q.q}</div>
+                  <div className="text-base font-medium text-foreground">{q.q}</div>
                 </div>
-                {isExpanded ? <ChevronDown size={16} className="text-muted-foreground shrink-0" /> : <ChevronRight size={16} className="text-muted-foreground shrink-0" />}
+                {isExpanded ? <ChevronDown size={18} className="text-muted-foreground shrink-0" /> : <ChevronRight size={18} className="text-muted-foreground shrink-0" />}
               </button>
               {isExpanded && (
-                <div className="px-4 pb-4 space-y-3 animate-fade-in border-t border-border pt-3">
+                <div className="px-5 pb-5 space-y-4 animate-fade-in border-t border-border pt-4">
                   <div>
-                    <div className="text-xs font-mono text-chart-4 mb-1">ANSWER</div>
-                    <div className="text-sm text-muted-foreground leading-relaxed">{q.answer}</div>
+                    <div className="text-sm font-mono text-chart-4 mb-1.5">ANSWER</div>
+                    <div className="text-base text-muted-foreground leading-relaxed">{q.answer}</div>
                   </div>
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-secondary/10 border border-secondary/20">
-                    <Target size={14} className="text-secondary mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-2.5 p-4 rounded-lg bg-secondary/10 border border-secondary/20">
+                    <Target size={16} className="text-secondary mt-0.5 shrink-0" />
                     <div>
-                      <div className="text-xs font-mono text-secondary mb-1">FOLLOW-UP QUESTION</div>
-                      <div className="text-sm text-secondary/80">{q.followUp}</div>
+                      <div className="text-sm font-mono text-secondary mb-1">FOLLOW-UP QUESTION</div>
+                      <div className="text-base text-secondary/80">{q.followUp}</div>
                     </div>
                   </div>
                   {q.trap && (
-                    <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                      <AlertTriangle size={14} className="text-destructive mt-0.5 shrink-0" />
+                    <div className="flex items-start gap-2.5 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                      <AlertTriangle size={16} className="text-destructive mt-0.5 shrink-0" />
                       <div>
-                        <div className="text-xs font-mono text-destructive mb-1">⚠ TRAP ALERT</div>
-                        <div className="text-sm text-destructive/80">{q.trap}</div>
+                        <div className="text-sm font-mono text-destructive mb-1">⚠ TRAP ALERT</div>
+                        <div className="text-base text-destructive/80">{q.trap}</div>
                       </div>
                     </div>
                   )}
