@@ -6,7 +6,7 @@ import {
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi" | "antenna";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -28,6 +28,7 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode }[] = [
   { id: "control", label: "Control Systems", icon: <Settings2 size={18} /> },
   { id: "embedded", label: "Embedded Lab", icon: <Microchip size={18} /> },
   { id: "vlsi", label: "VLSI Lab", icon: <Factory size={18} /> },
+  { id: "antenna", label: "Antenna Lab", icon: <Radio size={18} /> },
 ];
 
 const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps) => {
