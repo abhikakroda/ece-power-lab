@@ -8,6 +8,9 @@ import InterviewMode from "@/components/ece/InterviewMode";
 import NumericalDrill from "@/components/ece/NumericalDrill";
 import TransistorSimulator from "@/components/ece/TransistorSimulator";
 import DigitalLab from "@/components/ece/DigitalLab";
+import SpiceSimulator from "@/components/ece/SpiceSimulator";
+import ControlSystemsLab from "@/components/ece/ControlSystemsLab";
+import EmbeddedPlayground from "@/components/ece/EmbeddedPlayground";
 
 const Index = () => {
   const [section, setSection] = useState<LabSection>("home");
@@ -22,6 +25,9 @@ const Index = () => {
       case "drill": return <NumericalDrill />;
       case "transistor": return <TransistorSimulator />;
       case "digital": return <DigitalLab />;
+      case "spice": return <SpiceSimulator />;
+      case "control": return <ControlSystemsLab />;
+      case "embedded": return <EmbeddedPlayground />;
       default: return <DashboardHome onNavigate={setSection} />;
     }
   };

@@ -1,4 +1,4 @@
-import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight, Cpu, CircuitBoard } from "lucide-react";
+import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight, Cpu, CircuitBoard, Activity, Settings2, Microchip } from "lucide-react";
 import type { LabSection } from "./LabLayout";
 import heroBg from "@/assets/hero-bg.png";
 
@@ -76,6 +76,36 @@ const features = [
     borderColor: "border-chart-2/30",
     iconColor: "text-chart-2",
     glowClass: "box-glow-cyan",
+  },
+  {
+    id: "spice" as LabSection,
+    title: "SPICE Simulator",
+    desc: "Netlist-based MNA solver with DC, AC sweep & transient analysis",
+    icon: <Activity size={24} />,
+    gradient: "from-primary/20 to-primary/5",
+    borderColor: "border-primary/30",
+    iconColor: "text-primary",
+    glowClass: "box-glow",
+  },
+  {
+    id: "control" as LabSection,
+    title: "Control Systems Lab",
+    desc: "Transfer functions, Bode plots, step response, pole-zero maps",
+    icon: <Settings2 size={24} />,
+    gradient: "from-chart-4/20 to-chart-4/5",
+    borderColor: "border-chart-4/30",
+    iconColor: "text-chart-4",
+    glowClass: "",
+  },
+  {
+    id: "embedded" as LabSection,
+    title: "Embedded Playground",
+    desc: "PWM waveforms, ADC sampling, timer simulation, I2C timing",
+    icon: <Microchip size={24} />,
+    gradient: "from-chart-5/20 to-chart-5/5",
+    borderColor: "border-chart-5/30",
+    iconColor: "text-chart-5",
+    glowClass: "",
   },
 ];
 
