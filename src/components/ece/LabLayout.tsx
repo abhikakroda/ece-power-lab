@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
   Zap, Radio, BookOpen, BrainCircuit, Timer, Home, Brain,
-  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity, Factory
+  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity, Factory, Waves
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi" | "antenna";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi" | "antenna" | "comm";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -29,6 +29,7 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode }[] = [
   { id: "embedded", label: "Embedded Lab", icon: <Microchip size={18} /> },
   { id: "vlsi", label: "VLSI Lab", icon: <Factory size={18} /> },
   { id: "antenna", label: "Antenna Lab", icon: <Radio size={18} /> },
+  { id: "comm", label: "Comm Systems", icon: <Waves size={18} /> },
 ];
 
 const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps) => {
