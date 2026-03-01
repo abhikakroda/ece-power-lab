@@ -60,7 +60,27 @@ export function findRoots(coeffs: number[]): Complex[] {
   return roots.map((r) => Math.abs(r.im) < 1e-8 ? cx(r.re) : r);
 }
 
-// Transfer function H(s) = num(s) / den(s) evaluated at s
+// Reconstruct polynomial coefficients from roots: (s - r1)(s - r2)...
+// Returns real coefficients (highest power first)
+export function rootsToCoeffs(roots: Complex[]): number[] {
+  if (roots.length === 0) return [1];
+  // Start with [1]
+  let coeffs: Complex[] = [cx(1)];
+  for (const root of roots) {
+    // Multiply by (s - root)
+    const newCoeffs: Complex[] = new Array(coeffs.length + 1).fill(null).map(() => cx(0));
+    for (let i = 0; i < coeffs.length; i++) {
+      newCoeffs[i] = cxAdd(newCoeffs[i], coeffs[i]); // s term
+      newCoeffs[i + 1] = cxSub(newCoeffs[i + 1], cxMul(coeffs[i], root)); // -root term
+    }
+    coeffs = newCoeffs;
+  }
+  return coeffs.map(c => {
+    const v = c.re;
+    return Math.abs(v) < 1e-10 ? 0 : parseFloat(v.toFixed(10));
+  });
+}
+
 export function evalTF(num: number[], den: number[], s: Complex): Complex {
   return cxDiv(polyEval(num, s), polyEval(den, s));
 }
