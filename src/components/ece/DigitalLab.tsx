@@ -1,24 +1,28 @@
 import { useState } from "react";
-import { CircuitBoard, Columns3, ToggleRight, Binary, FileCode2 } from "lucide-react";
+import { CircuitBoard, Columns3, ToggleRight, Binary, FileCode2, Workflow, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LogicGateSandbox from "./digital/LogicGateSandbox";
 import KMapSolver from "./digital/KMapSolver";
 import FlipFlopLab from "./digital/FlipFlopLab";
 import NumberSystemWorkshop from "./digital/NumberSystemWorkshop";
 import BooleanEngine from "./digital/BooleanEngine";
+import LogicBuilder from "./digital/LogicBuilder";
+import FSMDesigner from "./digital/FSMDesigner";
 
-type DigitalTab = "gates" | "kmap" | "flipflop" | "numbers" | "boolean";
+type DigitalTab = "builder" | "gates" | "kmap" | "flipflop" | "numbers" | "boolean" | "fsm";
 
 const tabs: { id: DigitalTab; label: string; icon: React.ReactNode; desc: string }[] = [
+  { id: "builder", label: "Logic Builder", icon: <Workflow size={16} />, desc: "Interactive" },
   { id: "gates", label: "Logic Gates", icon: <CircuitBoard size={16} />, desc: "Sandbox" },
   { id: "boolean", label: "Boolean", icon: <FileCode2 size={16} />, desc: "Engine" },
   { id: "kmap", label: "K-Map", icon: <Columns3 size={16} />, desc: "Solver" },
   { id: "flipflop", label: "Flip-Flops", icon: <ToggleRight size={16} />, desc: "Timing Lab" },
   { id: "numbers", label: "Number Systems", icon: <Binary size={16} />, desc: "Workshop" },
+  { id: "fsm", label: "FSM Designer", icon: <Cpu size={16} />, desc: "State Machine" },
 ];
 
 const DigitalLab = () => {
-  const [activeTab, setActiveTab] = useState<DigitalTab>("gates");
+  const [activeTab, setActiveTab] = useState<DigitalTab>("builder");
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-6">
@@ -57,11 +61,13 @@ const DigitalLab = () => {
 
       {/* Content */}
       <div className="animate-fade-in" key={activeTab}>
+        {activeTab === "builder" && <LogicBuilder />}
         {activeTab === "gates" && <LogicGateSandbox />}
         {activeTab === "boolean" && <BooleanEngine />}
         {activeTab === "kmap" && <KMapSolver />}
         {activeTab === "flipflop" && <FlipFlopLab />}
         {activeTab === "numbers" && <NumberSystemWorkshop />}
+        {activeTab === "fsm" && <FSMDesigner />}
       </div>
     </div>
   );
