@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
   Zap, Radio, BookOpen, BrainCircuit, Timer, Home, Brain,
-  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity, Factory, Waves, Network
+  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity, Factory, Waves, Network, MemoryStick
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi" | "antenna" | "comm" | "networking";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded" | "vlsi" | "antenna" | "comm" | "networking" | "microprocessor";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -31,6 +31,7 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode }[] = [
   { id: "antenna", label: "Antenna Lab", icon: <Radio size={18} /> },
   { id: "comm", label: "Comm Systems", icon: <Waves size={18} /> },
   { id: "networking", label: "Networking", icon: <Network size={18} /> },
+  { id: "microprocessor", label: "Microprocessor", icon: <MemoryStick size={18} /> },
 ];
 
 const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps) => {
