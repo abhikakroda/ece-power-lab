@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
   Zap, Radio, BookOpen, BrainCircuit, Timer, Home,
-  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard
+  ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "interview" | "drill" | "transistor" | "digital";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -22,6 +22,9 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode; color: s
   { id: "drill", label: "Numerical Drill", icon: <Timer size={20} />, color: "text-destructive" },
   { id: "transistor", label: "BJT / MOSFET Lab", icon: <Cpu size={20} />, color: "text-chart-3" },
   { id: "digital", label: "Digital Lab", icon: <CircuitBoard size={20} />, color: "text-chart-2" },
+  { id: "spice", label: "SPICE Simulator", icon: <Activity size={20} />, color: "text-primary" },
+  { id: "control", label: "Control Systems", icon: <Settings2 size={20} />, color: "text-chart-4" },
+  { id: "embedded", label: "Embedded Lab", icon: <Microchip size={20} />, color: "text-chart-5" },
 ];
 
 const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps) => {
