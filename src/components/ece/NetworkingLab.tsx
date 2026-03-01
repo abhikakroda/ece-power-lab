@@ -7,11 +7,13 @@ import NetworkSimulator from "./networking/NetworkSimulator";
 import ProtocolAnalyzer from "./networking/ProtocolAnalyzer";
 import TCPCongestionLab from "./networking/TCPCongestionLab";
 import SubnetCalculator from "./networking/SubnetCalculator";
+import TopologySimLab from "./networking/TopologySimLab";
 
-type Tab = "simulator" | "protocol" | "tcp" | "osi" | "routing" | "subnet";
+type Tab = "simulator" | "topology" | "protocol" | "tcp" | "osi" | "routing" | "subnet";
 
 const tabs: [Tab, string][] = [
   ["simulator", "🖧 Network Simulator"],
+  ["topology", "🔷 Topology Lab"],
   ["protocol", "📋 Protocol Analyzer"],
   ["tcp", "📈 TCP Congestion"],
   ["routing", "🌐 Routing"],
@@ -48,6 +50,7 @@ const NetworkingLab = () => {
       </div>
 
       {tab === "simulator" && <NetworkSimulator />}
+      {tab === "topology" && <TopologySimLab />}
       {tab === "protocol" && <ProtocolAnalyzer />}
       {tab === "tcp" && <TCPCongestionLab />}
       {tab === "routing" && <RoutingSimulation />}
