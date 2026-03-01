@@ -15,6 +15,7 @@ import EmbeddedPlayground from "@/components/ece/EmbeddedPlayground";
 import VLSILab from "@/components/ece/VLSILab";
 import AntennaLab from "@/components/ece/AntennaLab";
 import CommSystemsLab from "@/components/ece/CommSystemsLab";
+import NetworkingLab from "@/components/ece/NetworkingLab";
 
 const Index = () => {
   const [section, setSection] = useState<LabSection>("home");
@@ -36,6 +37,7 @@ const Index = () => {
       case "vlsi": return <VLSILab />;
       case "antenna": return <AntennaLab />;
       case "comm": return <CommSystemsLab />;
+      case "networking": return <NetworkingLab />;
       default: return <DashboardHome onNavigate={setSection} />;
     }
   };
