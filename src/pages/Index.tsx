@@ -1,13 +1,31 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import LabLayout, { type LabSection } from "@/components/ece/LabLayout";
+import DashboardHome from "@/components/ece/DashboardHome";
+import CircuitSolver from "@/components/ece/CircuitSolver";
+import SignalVisualizer from "@/components/ece/SignalVisualizer";
+import FormulaEngine from "@/components/ece/FormulaEngine";
+import InterviewMode from "@/components/ece/InterviewMode";
+import NumericalDrill from "@/components/ece/NumericalDrill";
 
 const Index = () => {
+  const [section, setSection] = useState<LabSection>("home");
+
+  const renderSection = () => {
+    switch (section) {
+      case "home": return <DashboardHome onNavigate={setSection} />;
+      case "circuit": return <CircuitSolver />;
+      case "signal": return <SignalVisualizer />;
+      case "formula": return <FormulaEngine />;
+      case "interview": return <InterviewMode />;
+      case "drill": return <NumericalDrill />;
+      default: return <DashboardHome onNavigate={setSection} />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <LabLayout activeSection={section} onSectionChange={setSection}>
+      {renderSection()}
+    </LabLayout>
   );
 };
 
