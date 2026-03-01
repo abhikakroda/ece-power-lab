@@ -1,14 +1,26 @@
 import { useState } from "react";
 import { Network } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import OSIAnimation from "./networking/OSIAnimation";
 import RoutingSimulation from "./networking/RoutingSimulation";
+import NetworkSimulator from "./networking/NetworkSimulator";
+import ProtocolAnalyzer from "./networking/ProtocolAnalyzer";
+import TCPCongestionLab from "./networking/TCPCongestionLab";
+import SubnetCalculator from "./networking/SubnetCalculator";
 
-type Tab = "osi" | "routing";
+type Tab = "simulator" | "protocol" | "tcp" | "osi" | "routing" | "subnet";
+
+const tabs: [Tab, string][] = [
+  ["simulator", "🖧 Network Simulator"],
+  ["protocol", "📋 Protocol Analyzer"],
+  ["tcp", "📈 TCP Congestion"],
+  ["routing", "🌐 Routing"],
+  ["osi", "📦 OSI Layers"],
+  ["subnet", "🔢 Subnet Calculator"],
+];
 
 const NetworkingLab = () => {
-  const [tab, setTab] = useState<Tab>("osi");
+  const [tab, setTab] = useState<Tab>("simulator");
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-6">
@@ -17,29 +29,30 @@ const NetworkingLab = () => {
           <Network size={20} className="text-chart-4" />
         </div>
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Data Networking</h2>
-          <p className="text-sm text-muted-foreground">Packet Simulation • OSI Model • Routing</p>
+          <h2 className="text-2xl font-semibold text-foreground">Network Simulator</h2>
+          <p className="text-sm text-muted-foreground">NS3/GNS3-Style Lab • Topology Builder • Protocol Analysis • TCP/IP</p>
         </div>
       </div>
 
-      <div className="flex gap-1.5">
-        {([
-          ["osi", "📦 OSI Layer Animation"],
-          ["routing", "🌐 Routing Simulation"],
-        ] as [Tab, string][]).map(([id, label]) => (
-          <Button key={id} size="sm" onClick={() => setTab(id)}
-            className={cn("text-xs font-mono",
+      <div className="flex gap-1.5 flex-wrap">
+        {tabs.map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)}
+            className={cn("px-3 py-1.5 rounded-lg text-xs font-mono border transition-all",
               tab === id
-                ? "bg-chart-4 text-primary-foreground"
-                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                ? "bg-chart-4/15 border-chart-4/40 text-chart-4"
+                : "border-border text-muted-foreground hover:text-foreground"
             )}>
             {label}
-          </Button>
+          </button>
         ))}
       </div>
 
-      {tab === "osi" && <OSIAnimation />}
+      {tab === "simulator" && <NetworkSimulator />}
+      {tab === "protocol" && <ProtocolAnalyzer />}
+      {tab === "tcp" && <TCPCongestionLab />}
       {tab === "routing" && <RoutingSimulation />}
+      {tab === "osi" && <OSIAnimation />}
+      {tab === "subnet" && <SubnetCalculator />}
     </div>
   );
 };
