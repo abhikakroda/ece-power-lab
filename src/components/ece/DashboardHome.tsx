@@ -1,4 +1,4 @@
-import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight } from "lucide-react";
+import { Zap, Radio, BookOpen, BrainCircuit, Timer, ArrowRight, Cpu } from "lucide-react";
 import type { LabSection } from "./LabLayout";
 import heroBg from "@/assets/hero-bg.png";
 
@@ -55,6 +55,16 @@ const features = [
     gradient: "from-destructive/20 to-destructive/5",
     borderColor: "border-destructive/30",
     iconColor: "text-destructive",
+    glowClass: "",
+  },
+  {
+    id: "transistor" as LabSection,
+    title: "BJT / MOSFET Lab",
+    desc: "Interactive I-V curves, operating regions & real-world applications",
+    icon: <Cpu size={24} />,
+    gradient: "from-chart-3/20 to-chart-3/5",
+    borderColor: "border-chart-3/30",
+    iconColor: "text-chart-3",
     glowClass: "",
   },
 ];

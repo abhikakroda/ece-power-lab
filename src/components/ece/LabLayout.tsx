@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
   Zap, Radio, BookOpen, BrainCircuit, Timer, Home,
-  ChevronLeft, ChevronRight, Menu
+  ChevronLeft, ChevronRight, Menu, Cpu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "interview" | "drill";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "interview" | "drill" | "transistor";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -20,6 +20,7 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode; color: s
   { id: "formula", label: "Formula Engine", icon: <BookOpen size={20} />, color: "text-accent" },
   { id: "interview", label: "Interview Mode", icon: <BrainCircuit size={20} />, color: "text-chart-4" },
   { id: "drill", label: "Numerical Drill", icon: <Timer size={20} />, color: "text-destructive" },
+  { id: "transistor", label: "BJT / MOSFET Lab", icon: <Cpu size={20} />, color: "text-chart-3" },
 ];
 
 const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps) => {
