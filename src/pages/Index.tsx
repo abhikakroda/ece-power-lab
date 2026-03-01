@@ -4,6 +4,7 @@ import DashboardHome from "@/components/ece/DashboardHome";
 import CircuitSolver from "@/components/ece/CircuitSolver";
 import SignalVisualizer from "@/components/ece/SignalVisualizer";
 import FormulaEngine from "@/components/ece/FormulaEngine";
+import FormulaRecall from "@/components/ece/FormulaRecall";
 import InterviewMode from "@/components/ece/InterviewMode";
 import NumericalDrill from "@/components/ece/NumericalDrill";
 import TransistorSimulator from "@/components/ece/TransistorSimulator";
@@ -21,6 +22,7 @@ const Index = () => {
       case "circuit": return <CircuitSolver />;
       case "signal": return <SignalVisualizer />;
       case "formula": return <FormulaEngine />;
+      case "recall": return <FormulaRecall />;
       case "interview": return <InterviewMode />;
       case "drill": return <NumericalDrill />;
       case "transistor": return <TransistorSimulator />;

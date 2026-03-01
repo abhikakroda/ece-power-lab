@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
-  Zap, Radio, BookOpen, BrainCircuit, Timer, Home,
+  Zap, Radio, BookOpen, BrainCircuit, Timer, Home, Brain,
   ChevronLeft, ChevronRight, Menu, Cpu, CircuitBoard, Settings2, Microchip, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export type LabSection = "home" | "circuit" | "signal" | "formula" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded";
+export type LabSection = "home" | "circuit" | "signal" | "formula" | "recall" | "interview" | "drill" | "transistor" | "digital" | "spice" | "control" | "embedded";
 
 interface LabLayoutProps {
   activeSection: LabSection;
@@ -19,6 +19,7 @@ const navItems: { id: LabSection; label: string; icon: React.ReactNode }[] = [
   { id: "circuit", label: "Circuit Solver", icon: <Zap size={18} /> },
   { id: "signal", label: "Signal Lab", icon: <Radio size={18} /> },
   { id: "formula", label: "Formula Engine", icon: <BookOpen size={18} /> },
+  { id: "recall", label: "Formula Recall", icon: <Brain size={18} /> },
   { id: "interview", label: "Interview Mode", icon: <BrainCircuit size={18} /> },
   { id: "drill", label: "Numerical Drill", icon: <Timer size={18} /> },
   { id: "transistor", label: "BJT / MOSFET", icon: <Cpu size={18} /> },
