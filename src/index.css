@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css');
 
 @tailwind base;
 @tailwind components;
@@ -6,56 +7,97 @@
 
 @layer base {
   :root {
-    --background: 220 25% 5%;
-    --foreground: 140 20% 88%;
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
 
-    --card: 220 20% 9%;
-    --card-foreground: 140 20% 88%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 15% 15%;
 
-    --popover: 220 20% 9%;
-    --popover-foreground: 140 20% 88%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 142 100% 45%;
-    --primary-foreground: 220 25% 5%;
+    --primary: 213 80% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 187 80% 42%;
-    --secondary-foreground: 220 25% 5%;
+    --secondary: 213 60% 92%;
+    --secondary-foreground: 213 80% 35%;
 
-    --muted: 220 15% 14%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 38 90% 55%;
-    --accent-foreground: 220 25% 5%;
+    --accent: 213 60% 94%;
+    --accent-foreground: 213 80% 35%;
 
-    --destructive: 0 80% 55%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 16%;
-    --input: 220 15% 14%;
-    --ring: 142 100% 45%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 213 80% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
-    --sidebar-background: 220 20% 7%;
-    --sidebar-foreground: 140 20% 88%;
-    --sidebar-primary: 142 100% 45%;
-    --sidebar-primary-foreground: 220 25% 5%;
-    --sidebar-accent: 220 15% 12%;
-    --sidebar-accent-foreground: 140 20% 88%;
-    --sidebar-border: 220 15% 16%;
-    --sidebar-ring: 142 100% 45%;
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 220 15% 15%;
+    --sidebar-primary: 213 80% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 213 60% 96%;
+    --sidebar-accent-foreground: 213 80% 35%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 213 80% 50%;
 
-    --chart-1: 142 100% 45%;
-    --chart-2: 187 80% 42%;
-    --chart-3: 38 90% 55%;
-    --chart-4: 280 70% 55%;
-    --chart-5: 0 80% 55%;
+    --chart-1: 213 80% 50%;
+    --chart-2: 196 70% 45%;
+    --chart-3: 37 90% 51%;
+    --chart-4: 262 60% 55%;
+    --chart-5: 0 72% 51%;
 
-    --glow-primary: 0 0 20px hsl(142 100% 45% / 0.3);
-    --glow-secondary: 0 0 20px hsl(187 80% 42% / 0.3);
-    --glow-accent: 0 0 20px hsl(38 90% 55% / 0.3);
+    font-family: 'Inter', sans-serif;
+  }
 
-    font-family: 'Space Grotesk', sans-serif;
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 214 20% 88%;
+
+    --card: 220 10% 8%;
+    --card-foreground: 214 20% 88%;
+
+    --popover: 220 10% 8%;
+    --popover-foreground: 214 20% 88%;
+
+    --primary: 213 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 16%;
+    --secondary-foreground: 213 60% 70%;
+
+    --muted: 220 12% 12%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 215 20% 14%;
+    --accent-foreground: 213 60% 70%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 10% 14%;
+    --input: 220 12% 12%;
+    --ring: 213 80% 55%;
+
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 214 20% 88%;
+    --sidebar-primary: 213 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 15% 11%;
+    --sidebar-accent-foreground: 214 20% 88%;
+    --sidebar-border: 220 10% 14%;
+    --sidebar-ring: 213 80% 55%;
+
+    --chart-1: 213 80% 55%;
+    --chart-2: 196 70% 50%;
+    --chart-3: 37 90% 55%;
+    --chart-4: 262 60% 60%;
+    --chart-5: 0 72% 55%;
   }
 }
 
@@ -69,7 +111,8 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
   }
 
   code, pre, .font-mono {
@@ -79,44 +122,46 @@
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 10px hsl(142 100% 45% / 0.5), 0 0 30px hsl(142 100% 45% / 0.2);
+    text-shadow: 0 0 10px hsl(213 80% 55% / 0.4), 0 0 30px hsl(213 80% 55% / 0.15);
   }
 
   .text-glow-cyan {
-    text-shadow: 0 0 10px hsl(187 80% 42% / 0.5), 0 0 30px hsl(187 80% 42% / 0.2);
+    text-shadow: 0 0 10px hsl(196 70% 50% / 0.4), 0 0 30px hsl(196 70% 50% / 0.15);
   }
 
   .text-glow-amber {
-    text-shadow: 0 0 10px hsl(38 90% 55% / 0.5), 0 0 30px hsl(38 90% 55% / 0.2);
+    text-shadow: 0 0 10px hsl(37 90% 55% / 0.4), 0 0 30px hsl(37 90% 55% / 0.15);
   }
 
   .box-glow {
-    box-shadow: 0 0 15px hsl(142 100% 45% / 0.15), 0 0 40px hsl(142 100% 45% / 0.05);
+    box-shadow: 0 0 15px hsl(213 80% 55% / 0.1), 0 0 40px hsl(213 80% 55% / 0.04);
   }
 
   .box-glow-cyan {
-    box-shadow: 0 0 15px hsl(187 80% 42% / 0.15), 0 0 40px hsl(187 80% 42% / 0.05);
+    box-shadow: 0 0 15px hsl(196 70% 50% / 0.1), 0 0 40px hsl(196 70% 50% / 0.04);
   }
 
   .grid-bg {
     background-image: 
-      linear-gradient(hsl(220 15% 16% / 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(220 15% 16% / 0.5) 1px, transparent 1px);
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
   .scanline {
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      hsl(142 100% 45% / 0.03) 2px,
-      hsl(142 100% 45% / 0.03) 4px
-    );
+    background: none;
   }
 
   .oscilloscope-border {
-    border: 1px solid hsl(142 100% 45% / 0.2);
-    box-shadow: inset 0 0 30px hsl(142 100% 45% / 0.05), 0 0 15px hsl(142 100% 45% / 0.1);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.04);
+  }
+
+  /* KaTeX overrides */
+  .katex {
+    font-size: 1.05em;
+  }
+  .katex-display {
+    margin: 0.5em 0;
   }
 }
