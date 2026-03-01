@@ -33,7 +33,7 @@ R1 1 2 1k
 C1 2 0 100n`,
   },
   {
-    name: "RLC Series Resonance",
+    name: "RLC Resonance",
     analysis: "ac",
     desc: "Series RLC, f0 ≈ 5.03 kHz",
     netlist: `V1 1 0 1
@@ -42,29 +42,76 @@ L1 2 3 10m
 C1 3 0 100n`,
   },
   {
-    name: "RLC Transient",
-    analysis: "tran",
-    desc: "Step response of series RLC",
-    netlist: `V1 1 0 5
-R1 1 2 50
-L1 2 3 10m
-C1 3 0 1u`,
-  },
-  {
     name: "RC Charging",
     analysis: "tran",
-    desc: "Capacitor charging through R, τ = RC",
+    desc: "Capacitor charging, τ = RC",
     netlist: `V1 1 0 10
 R1 1 2 10k
 C1 2 0 10u`,
   },
   {
-    name: "RL High-Pass",
-    analysis: "ac",
-    desc: "RL HPF, output across R",
-    netlist: `V1 1 0 1
-L1 1 2 10m
+    name: "Diode Rectifier",
+    analysis: "dc",
+    desc: "Half-wave rectifier DC bias",
+    netlist: `V1 1 0 5
+D1 1 2
 R1 2 0 1k`,
+  },
+  {
+    name: "Diode Clamp",
+    analysis: "dc",
+    desc: "Diode voltage clamp at ~0.7V",
+    netlist: `V1 1 0 3
+R1 1 2 1k
+D1 2 0`,
+  },
+  {
+    name: "BJT CE Amplifier",
+    analysis: "dc",
+    desc: "Common-emitter NPN biasing",
+    netlist: `V1 1 0 12
+R1 1 2 100k
+R2 2 0 22k
+Q1 3 2 4 Bf=100
+R3 1 3 4.7k
+R4 4 0 1k`,
+  },
+  {
+    name: "BJT Switch",
+    analysis: "dc",
+    desc: "NPN switching circuit",
+    netlist: `V1 1 0 5
+V2 3 0 3.3
+R1 3 2 10k
+Q1 4 2 0 Bf=200
+R2 1 4 1k`,
+  },
+  {
+    name: "NMOS Inverter",
+    analysis: "dc",
+    desc: "NMOS with resistive load",
+    netlist: `V1 1 0 5
+V2 2 0 3
+M1 3 2 0 Vth=1 Kp=1m
+R1 1 3 2k`,
+  },
+  {
+    name: "CMOS Biasing",
+    analysis: "dc",
+    desc: "MOSFET in saturation",
+    netlist: `V1 1 0 5
+V2 2 0 2.5
+M1 3 2 0 Vth=0.7 Kp=500u Lambda=0.02
+R1 1 3 5k`,
+  },
+  {
+    name: "Diode + RC",
+    analysis: "tran",
+    desc: "Diode charging circuit",
+    netlist: `V1 1 0 5
+D1 1 2
+R1 2 3 1k
+C1 3 0 1u`,
   },
 ];
 
@@ -160,8 +207,9 @@ const SpiceSimulator = () => {
               className="font-mono text-sm bg-muted border-border text-foreground min-h-[160px] resize-none"
               placeholder="V1 1 0 10&#10;R1 1 2 1k&#10;C1 2 0 100n"
             />
-            <div className="mt-2 text-[10px] text-muted-foreground font-mono">
-              Format: TYPE NODE+ NODE- VALUE • Suffixes: p n u m k meg
+            <div className="mt-2 text-[10px] text-muted-foreground font-mono space-y-0.5">
+              <div>R/L/C/V/I: NAME N+ N- VALUE • D: NAME A K [Is=] [N=]</div>
+              <div>Q: NAME C B E [Bf=] [Is=] • M: NAME D G S [Vth=] [Kp=] [Lambda=]</div>
             </div>
           </div>
 
@@ -370,7 +418,7 @@ const SpiceSimulator = () => {
             <div className="p-12 rounded-xl bg-card border border-border text-center">
               <Cpu size={40} className="text-muted-foreground mx-auto mb-3 opacity-30" />
               <div className="text-muted-foreground text-sm">Enter a netlist and click RUN SIMULATION</div>
-              <div className="text-xs text-muted-foreground mt-1">Supports R, L, C, V, I components</div>
+              <div className="text-xs text-muted-foreground mt-1">Supports R, L, C, V, I, D (diode), Q (BJT), M (MOSFET)</div>
             </div>
           )}
         </div>
