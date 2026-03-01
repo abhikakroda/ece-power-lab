@@ -12,6 +12,7 @@ import DigitalLab from "@/components/ece/DigitalLab";
 import SpiceSimulator from "@/components/ece/SpiceSimulator";
 import ControlSystemsLab from "@/components/ece/ControlSystemsLab";
 import EmbeddedPlayground from "@/components/ece/EmbeddedPlayground";
+import VLSILab from "@/components/ece/VLSILab";
 
 const Index = () => {
   const [section, setSection] = useState<LabSection>("home");
@@ -30,6 +31,7 @@ const Index = () => {
       case "spice": return <SpiceSimulator />;
       case "control": return <ControlSystemsLab />;
       case "embedded": return <EmbeddedPlayground />;
+      case "vlsi": return <VLSILab />;
       default: return <DashboardHome onNavigate={setSection} />;
     }
   };
