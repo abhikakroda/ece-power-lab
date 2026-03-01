@@ -7,6 +7,7 @@ import FormulaEngine from "@/components/ece/FormulaEngine";
 import InterviewMode from "@/components/ece/InterviewMode";
 import NumericalDrill from "@/components/ece/NumericalDrill";
 import TransistorSimulator from "@/components/ece/TransistorSimulator";
+import DigitalLab from "@/components/ece/DigitalLab";
 
 const Index = () => {
   const [section, setSection] = useState<LabSection>("home");
@@ -20,6 +21,7 @@ const Index = () => {
       case "interview": return <InterviewMode />;
       case "drill": return <NumericalDrill />;
       case "transistor": return <TransistorSimulator />;
+      case "digital": return <DigitalLab />;
       default: return <DashboardHome onNavigate={setSection} />;
     }
   };
