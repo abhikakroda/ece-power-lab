@@ -76,7 +76,7 @@ const NumericalDrill = () => {
             <Timer size={20} className="text-destructive" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Numerical Drill</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Numerical Drill</h2>
             <p className="text-sm text-muted-foreground font-mono">Timed Tests • Step-by-Step Solutions</p>
           </div>
         </div>
@@ -86,7 +86,7 @@ const NumericalDrill = () => {
             <Timer size={40} className="text-destructive" />
           </div>
           <h3 className="text-xl font-bold text-foreground">Ready for the Drill?</h3>
-          <p className="text-muted-foreground text-sm">5 random numerical problems • 2 minutes • Step-by-step solutions after submission</p>
+          <p className="text-muted-foreground text-base">5 random numerical problems • 2 minutes • Step-by-step solutions after submission</p>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="p-3 rounded-lg bg-card border border-border">
               <div className="text-lg font-mono font-bold text-primary">5</div>
@@ -139,7 +139,7 @@ const NumericalDrill = () => {
             <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">{problem.topic}</span>
             <span className="text-xs font-mono text-muted-foreground">Q{currentQ + 1}/{shuffled.length}</span>
           </div>
-          <p className="text-lg text-foreground font-medium">{problem.question}</p>
+          <p className="text-lg md:text-xl text-foreground font-medium leading-relaxed">{problem.question}</p>
         </div>
 
         {/* Options */}
@@ -149,7 +149,7 @@ const NumericalDrill = () => {
               key={idx}
               onClick={() => selectAnswer(idx)}
               className={cn(
-                "w-full text-left p-4 rounded-xl border transition-all text-sm",
+                "w-full text-left p-4 rounded-xl border transition-all text-base",
                 answers[currentQ] === idx
                   ? "border-primary bg-primary/10 text-foreground"
                   : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -210,12 +210,12 @@ const NumericalDrill = () => {
               <div className="flex items-start gap-3">
                 {isCorrect ? <CheckCircle size={18} className="text-primary mt-0.5 shrink-0" /> : <XCircle size={18} className="text-destructive mt-0.5 shrink-0" />}
                 <div className="flex-1 space-y-2">
-                  <div className="text-sm font-medium text-foreground">{p.question}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-base font-medium text-foreground">{p.question}</div>
+                  <div className="text-sm text-muted-foreground mt-1">
                     Your answer: <span className={isCorrect ? "text-primary" : "text-destructive"}>{answers[i] !== null ? p.options[answers[i]!] : "Not answered"}</span>
                     {!isCorrect && <> • Correct: <span className="text-primary">{p.options[p.correct]}</span></>}
                   </div>
-                  <div className="text-xs font-mono text-muted-foreground bg-muted p-3 rounded-lg mt-2">
+                  <div className="text-sm font-mono text-muted-foreground bg-muted p-4 rounded-lg mt-2">
                     💡 {p.solution}
                   </div>
                 </div>

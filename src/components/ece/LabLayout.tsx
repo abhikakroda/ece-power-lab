@@ -58,20 +58,20 @@ const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps)
         )}
       >
         {/* Logo */}
-        <div className={cn("flex items-center gap-2.5 p-3 border-b border-border", collapsed && "justify-center")}>
-          <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
-            <Zap size={14} className="text-primary" />
+        <div className={cn("flex items-center gap-2.5 p-4 border-b border-border", collapsed && "justify-center")}>
+          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+            <Zap size={16} className="text-primary" />
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-semibold text-foreground truncate">ECE Lab</h1>
+              <h1 className="text-base font-semibold text-foreground truncate">ECE Lab</h1>
             </div>
           )}
           {!collapsed && <ThemeToggle />}
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-2 px-1.5 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -80,7 +80,7 @@ const LabLayout = ({ activeSection, onSectionChange, children }: LabLayoutProps)
                 setMobileOpen(false);
               }}
               className={cn(
-                "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all",
+                "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all",
                 collapsed && "justify-center px-0",
                 activeSection === item.id
                   ? "bg-primary/10 text-primary font-medium"

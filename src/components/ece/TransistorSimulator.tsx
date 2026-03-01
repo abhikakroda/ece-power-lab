@@ -174,21 +174,22 @@ const TransistorSimulator = () => {
   ];
 
   const tooltipStyle = {
-    background: "hsl(220 20% 9%)",
-    border: "1px solid hsl(220 15% 16%)",
-    color: "hsl(140 20% 88%)",
+    background: "hsl(var(--card))",
+    border: "1px solid hsl(var(--border))",
+    color: "hsl(var(--foreground))",
+    fontSize: 13,
   };
-  const tickStyle = { fill: "hsl(220 10% 50%)", fontSize: 10 };
+  const tickStyle = { fill: "hsl(var(--muted-foreground))", fontSize: 12 };
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-chart-3/20 flex items-center justify-center">
-          <Cpu size={20} className="text-chart-3" />
+        <div className="w-11 h-11 rounded-lg bg-chart-3/20 flex items-center justify-center">
+          <Cpu size={22} className="text-chart-3" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Transistor Simulator</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Transistor Simulator</h2>
           <p className="text-sm text-muted-foreground font-mono">BJT & MOSFET I-V Curves • Real Applications</p>
         </div>
       </div>
@@ -230,7 +231,7 @@ const TransistorSimulator = () => {
               { key: "VCE_max" as const, label: "VCE Max (V)", val: bjt.VCE_max, step: "1" },
             ].map((p) => (
               <div key={p.key}>
-                <Label className="text-xs text-muted-foreground">{p.label}</Label>
+                <Label className="text-sm text-muted-foreground">{p.label}</Label>
                 <Input type="number" value={p.val} step={p.step}
                   onChange={(e) => { const n = parseFloat(e.target.value); if (!isNaN(n) && n > 0) setBjt((prev) => ({ ...prev, [p.key]: n })); }}
                   className="font-mono bg-muted border-border text-foreground mt-1"
@@ -250,16 +251,16 @@ const TransistorSimulator = () => {
           </div>
 
           {/* BJT Charts */}
-          <div className="p-6 rounded-xl bg-card border border-border oscilloscope-border">
-            <h3 className="text-sm font-semibold text-foreground mb-4 font-mono">
+           <div className="p-6 rounded-xl bg-card border border-border oscilloscope-border">
+            <h3 className="text-base font-semibold text-foreground mb-4 font-mono">
               {bjtPlot === "output" ? "📊 OUTPUT CHARACTERISTICS (IC vs VCE)" : bjtPlot === "input" ? "📊 INPUT CHARACTERISTICS (IB vs VBE)" : "📊 TRANSFER CHARACTERISTICS (IC vs VBE)"}
             </h3>
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={420}>
               {bjtPlot === "output" ? (
-                <LineChart data={bjtOutputData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 15% 16%)" />
-                  <XAxis dataKey="VCE" tick={tickStyle} label={{ value: "VCE (V)", position: "bottom", fill: "hsl(220 10% 50%)" }} />
-                  <YAxis tick={tickStyle} label={{ value: "IC (mA)", angle: -90, position: "insideLeft", fill: "hsl(220 10% 50%)" }} />
+                <LineChart data={bjtOutputData} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="VCE" tick={tickStyle} label={{ value: "VCE (V)", position: "bottom", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: 10 }} />
+                  <YAxis tick={tickStyle} width={50} label={{ value: "IC (mA)", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 13 }} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
                   {[10, 20, 30, 40, 50].map((ib, i) => (
@@ -267,18 +268,18 @@ const TransistorSimulator = () => {
                   ))}
                 </LineChart>
               ) : bjtPlot === "input" ? (
-                <LineChart data={bjtInputData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 15% 16%)" />
-                  <XAxis dataKey="VBE" tick={tickStyle} label={{ value: "VBE (V)", position: "bottom", fill: "hsl(220 10% 50%)" }} />
-                  <YAxis tick={tickStyle} label={{ value: "IB (μA)", angle: -90, position: "insideLeft", fill: "hsl(220 10% 50%)" }} />
+                <LineChart data={bjtInputData} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="VBE" tick={tickStyle} label={{ value: "VBE (V)", position: "bottom", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: 10 }} />
+                  <YAxis tick={tickStyle} width={50} label={{ value: "IB (μA)", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 13 }} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Line type="monotone" dataKey="IB" stroke="hsl(142 100% 45%)" strokeWidth={2} dot={false} name="IB (μA)" />
                 </LineChart>
               ) : (
-                <LineChart data={bjtTransferData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 15% 16%)" />
-                  <XAxis dataKey="VBE" tick={tickStyle} label={{ value: "VBE (V)", position: "bottom", fill: "hsl(220 10% 50%)" }} />
-                  <YAxis tick={tickStyle} label={{ value: "IC (mA)", angle: -90, position: "insideLeft", fill: "hsl(220 10% 50%)" }} />
+                <LineChart data={bjtTransferData} margin={{ top: 10, right: 20, bottom: 25, left: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="VBE" tick={tickStyle} label={{ value: "VBE (V)", position: "bottom", fill: "hsl(var(--muted-foreground))", fontSize: 13, offset: 10 }} />
+                  <YAxis tick={tickStyle} width={50} label={{ value: "IC (mA)", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))", fontSize: 13 }} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Line type="monotone" dataKey="IC" stroke="hsl(187 80% 42%)" strokeWidth={2} dot={false} name="IC (mA)" />
                 </LineChart>
@@ -286,14 +287,14 @@ const TransistorSimulator = () => {
             </ResponsiveContainer>
 
             {/* Region Annotations */}
-            <div className="mt-4 flex flex-wrap gap-3 text-xs font-mono">
-              <div className="px-3 py-1.5 rounded bg-muted border border-border">
+            <div className="mt-4 flex flex-wrap gap-3 text-sm font-mono">
+              <div className="px-3 py-2 rounded bg-muted border border-border">
                 <span className="text-muted-foreground">Cutoff:</span> <span className="text-destructive">VBE &lt; 0.7V, IC ≈ 0</span>
               </div>
-              <div className="px-3 py-1.5 rounded bg-muted border border-border">
+              <div className="px-3 py-2 rounded bg-muted border border-border">
                 <span className="text-muted-foreground">Active:</span> <span className="text-primary">VBE ≈ 0.7V, IC = βIB</span>
               </div>
-              <div className="px-3 py-1.5 rounded bg-muted border border-border">
+              <div className="px-3 py-2 rounded bg-muted border border-border">
                 <span className="text-muted-foreground">Saturation:</span> <span className="text-accent">VCE &lt; 0.2V, both junctions fwd</span>
               </div>
             </div>
@@ -307,14 +308,14 @@ const TransistorSimulator = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {bjtApplications.map((app) => (
                 <div key={app.title} className="p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors group">
-                  <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                  <h4 className="text-base font-semibold text-foreground mb-2 flex items-center gap-2">
                     <ArrowRight size={14} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     {app.title}
                   </h4>
-                  <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{app.desc}</p>
-                  <div className="space-y-1.5">
-                    <div className="text-xs font-mono text-primary bg-primary/10 px-2 py-1 rounded inline-block">{app.formula}</div>
-                    <div className="text-[10px] text-muted-foreground"><span className="text-accent">Operating:</span> {app.operating}</div>
+                  <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{app.desc}</p>
+                  <div className="space-y-2">
+                    <div className="text-sm font-mono text-primary bg-primary/10 px-2.5 py-1.5 rounded inline-block">{app.formula}</div>
+                    <div className="text-xs text-muted-foreground"><span className="text-accent">Operating:</span> {app.operating}</div>
                   </div>
                 </div>
               ))}
@@ -337,7 +338,7 @@ const TransistorSimulator = () => {
               { key: "VGS_max" as const, label: "VGS Max (V)", val: mos.VGS_max, step: "0.5" },
             ].map((p) => (
               <div key={p.key}>
-                <Label className="text-xs text-muted-foreground">{p.label}</Label>
+                <Label className="text-sm text-muted-foreground">{p.label}</Label>
                 <Input type="number" value={p.val} step={p.step}
                   onChange={(e) => { const n = parseFloat(e.target.value); if (!isNaN(n) && n > 0) setMos((prev) => ({ ...prev, [p.key]: n })); }}
                   className="font-mono bg-muted border-border text-foreground mt-1"
