@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { Waves } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ModulationPlayground from "./comm/ModulationPlayground";
+import ChannelNoiseEngine from "./comm/ChannelNoiseEngine";
+import BERCodingLab from "./comm/BERCodingLab";
+import CapacityLab from "./comm/CapacityLab";
+import ConstellationLab from "./comm/ConstellationLab";
 import SamplingVisualizer from "./comm/SamplingVisualizer";
 
-type Tab = "modulation" | "sampling";
+type Tab = "modulation" | "channel" | "ber" | "capacity" | "constellation" | "sampling";
+
+const tabs: [Tab, string][] = [
+  ["modulation", "📡 Modulation"],
+  ["channel", "📶 Channel & Noise"],
+  ["ber", "🔬 BER & Coding"],
+  ["capacity", "📊 Capacity"],
+  ["constellation", "🧩 Constellation"],
+  ["sampling", "🎚️ Sampling"],
+];
 
 const CommSystemsLab = () => {
   const [tab, setTab] = useState<Tab>("modulation");
@@ -18,27 +30,28 @@ const CommSystemsLab = () => {
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Communication Systems</h2>
-          <p className="text-sm text-muted-foreground">Signal Chain Simulator • Modulation • Sampling</p>
+          <p className="text-sm text-muted-foreground">Signal Transmission Playground • Modulation → Channel → BER</p>
         </div>
       </div>
 
-      <div className="flex gap-1.5">
-        {([
-          ["modulation", "📡 Modulation Playground"],
-          ["sampling", "🎚️ Sampling & Aliasing"],
-        ] as [Tab, string][]).map(([id, label]) => (
-          <Button key={id} size="sm" onClick={() => setTab(id)}
-            className={cn("text-xs font-mono",
+      <div className="flex gap-1.5 flex-wrap">
+        {tabs.map(([id, label]) => (
+          <button key={id} onClick={() => setTab(id)}
+            className={cn("px-3 py-1.5 rounded-lg text-xs font-mono border transition-all",
               tab === id
-                ? "bg-chart-2 text-primary-foreground"
-                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                ? "bg-chart-2/15 border-chart-2/40 text-chart-2"
+                : "border-border text-muted-foreground hover:text-foreground"
             )}>
             {label}
-          </Button>
+          </button>
         ))}
       </div>
 
       {tab === "modulation" && <ModulationPlayground />}
+      {tab === "channel" && <ChannelNoiseEngine />}
+      {tab === "ber" && <BERCodingLab />}
+      {tab === "capacity" && <CapacityLab />}
+      {tab === "constellation" && <ConstellationLab />}
       {tab === "sampling" && <SamplingVisualizer />}
     </div>
   );
