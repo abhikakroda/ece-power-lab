@@ -8,7 +8,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import {
-  findRoots, computeBode, computeStepResponse, computeImpulseResponse,
+  findRoots, computeBode, computeStepResponse, computeImpulseResponse, computeRootLocus,
   rootsToCoeffs,
 } from "@/lib/control-engine";
 import { type Complex, cx, cxMag } from "@/lib/spice-engine";
@@ -104,10 +104,12 @@ const challenges: Challenge[] = [
 const InteractivePoleZero = ({
   poles,
   zeros,
+  rootLocus,
   onPolesChange,
 }: {
   poles: Complex[];
   zeros: Complex[];
+  rootLocus?: { gain: number, roots: Complex[] }[];
   onPolesChange: (newPoles: Complex[]) => void;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -260,7 +262,25 @@ const InteractivePoleZero = ({
         const { x, y } = toSvg(z.re, z.im);
         return (
           <circle key={`z${i}`} cx={x} cy={y} r={7}
-            fill="none" stroke="hsl(var(--primary))" strokeWidth={2} />
+            fill="none" stroke="hsl(var(--primary))" strokeWidth={2} className="z-20" />
+        );
+      })}
+
+      {/* Root Locus Trajectories */}
+      {rootLocus && rootLocus.length > 0 && rootLocus[0].roots.map((_, rootIdx) => {
+        let path = "";
+        rootLocus.forEach((pt, ptIdx) => {
+          // A bit of heuristic to trace the correct branch by picking the closest root
+          // This requires sorting roots per point by continuity
+          const r = pt.roots[rootIdx];
+          if (!r) return;
+          const { x, y } = toSvg(r.re, r.im);
+          if (ptIdx === 0) path += `M ${x} ${y} `;
+          else path += `L ${x} ${y} `;
+        });
+
+        return (
+          <path key={`rl_${rootIdx}`} d={path} fill="none" stroke="hsl(var(--chart-3))" strokeWidth={2} opacity={0.6} />
         );
       })}
 
@@ -411,8 +431,8 @@ const StabilityGame = () => {
           <div className="text-sm font-bold text-foreground">{ch.name}</div>
           <div className={cn("text-[10px] font-mono px-2 py-0.5 rounded border",
             ch.difficulty === "Easy" ? "border-primary/30 text-primary" :
-            ch.difficulty === "Medium" ? "border-chart-3/30 text-chart-3" :
-            "border-destructive/30 text-destructive"
+              ch.difficulty === "Medium" ? "border-chart-3/30 text-chart-3" :
+                "border-destructive/30 text-destructive"
           )}>{ch.difficulty}</div>
         </div>
         <div className="text-xs text-muted-foreground mb-3">{ch.desc}</div>
@@ -602,6 +622,44 @@ const ControlSystemsLab = () => {
   const impulseData = useMemo(() => computed ? computeImpulseResponse(num, den, tStop, 500) : [], [num, den, tStop, computed]);
   const bodeData = useMemo(() => computed ? computeBode(num, den, 0.01, 1000, 300) : [], [num, den, computed]);
 
+  // Calculate root locus up to K = 100
+  const rootLocusData = useMemo(() => {
+    if (!computed || den.length === 0) return [];
+    // A simplified locus trace. Real locus tracing needs root matching to avoid lines jumping,
+    // but we can pass the basic points down.
+    const locusPoints = computeRootLocus(num, den, 100, 200);
+
+    // Sort roots continuously so that branches don't jump indices
+    const sortedLocus = [locusPoints[0]];
+    for (let i = 1; i < locusPoints.length; i++) {
+      const prevRoots = sortedLocus[i - 1].roots;
+      const currRoots = [...locusPoints[i].roots];
+      const matched: Complex[] = [];
+
+      for (const pr of prevRoots) {
+        let bestDist = Infinity;
+        let bestIdx = -1;
+        for (let j = 0; j < currRoots.length; j++) {
+          if (!currRoots[j]) continue;
+          const dist = Math.hypot(currRoots[j].re - pr.re, currRoots[j].im - pr.im);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestIdx = j;
+          }
+        }
+        if (bestIdx !== -1) {
+          matched.push(currRoots[bestIdx]);
+          currRoots[bestIdx] = null as any; // mark used
+        } else {
+          matched.push(pr); // fallback
+        }
+      }
+      sortedLocus.push({ gain: locusPoints[i].gain, roots: matched });
+    }
+
+    return sortedLocus;
+  }, [num, den, computed]);
+
   useEffect(() => {
     setInteractivePoles(null);
   }, [basePoles.length]);
@@ -790,6 +848,7 @@ const ControlSystemsLab = () => {
                       <InteractivePoleZero
                         poles={activePoles}
                         zeros={zeros}
+                        rootLocus={rootLocusData}
                         onPolesChange={handlePolesChange}
                       />
                     </div>

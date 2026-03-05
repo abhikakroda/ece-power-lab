@@ -198,3 +198,48 @@ export function computeImpulseResponse(num: number[], den: number[], tStop: numb
 
   return data;
 }
+
+export interface RootLocusPoint {
+  gain: number;
+  roots: Complex[];
+}
+
+export function computeRootLocus(num: number[], den: number[], kMax: number, points: number): RootLocusPoint[] {
+  const data: RootLocusPoint[] = [];
+
+  // To avoid log curve squeezing, we distribute K exponentially after the first few linear steps
+  // K goes from 0 to kMax
+  const kStep = kMax / points;
+
+  for (let i = 0; i <= points; i++) {
+    // Determine K (mix of linear early on and exponential later for better curve capture)
+    let K = 0;
+    if (i === 0) K = 0;
+    else if (i < points * 0.2) {
+      K = (i / (points * 0.2)) * (kMax * 0.05); // first 20% of points cover 5% of K range
+    } else {
+      const logStart = Math.log10(kMax * 0.05);
+      const logEnd = Math.log10(kMax);
+      const ratio = (i - points * 0.2) / (points * 0.8);
+      K = Math.pow(10, logStart + ratio * (logEnd - logStart));
+    }
+
+    // Characteristic Equation: Den(s) + K * Num(s) = 0
+    // Pad arrays to match highest degree
+    const maxLen = Math.max(num.length, den.length);
+    const padNum = [...Array(maxLen - num.length).fill(0), ...num];
+    const padDen = [...Array(maxLen - den.length).fill(0), ...den];
+
+    const charEq = padDen.map((d, idx) => d + K * padNum[idx]);
+
+    // Find roots of characteristic equation
+    const locusRoots = findRoots(charEq);
+
+    data.push({
+      gain: K,
+      roots: locusRoots
+    });
+  }
+
+  return data;
+}

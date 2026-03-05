@@ -47,7 +47,7 @@ const combine = (a: Implicant, b: Implicant, diffPos: number, numVars: number): 
 const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number): Implicant[] => {
   if (minterms.length === 0) return [];
   const allTerms = [...minterms, ...dontCares];
-  
+
   let implicants: Implicant[] = allTerms.map(m => ({
     minterms: [m],
     bits: Array.from({ length: numVars }, (_, i) => ((m >> (numVars - 1 - i)) & 1) as 0 | 1),
@@ -55,14 +55,14 @@ const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number
   }));
 
   const primeImplicants: Implicant[] = [];
-  
+
   // Iteratively combine
   let changed = true;
   while (changed) {
     changed = false;
     const nextGen: Implicant[] = [];
     const seen = new Set<string>();
-    
+
     for (let i = 0; i < implicants.length; i++) {
       for (let j = i + 1; j < implicants.length; j++) {
         const diffPos = canCombine(implicants[i], implicants[j], numVars);
@@ -79,7 +79,7 @@ const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number
         }
       }
     }
-    
+
     // Unused implicants are prime
     implicants.filter(imp => !imp.used).forEach(imp => {
       const key = imp.bits.join(",");
@@ -88,17 +88,17 @@ const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number
         primeImplicants.push(imp);
       }
     });
-    
+
     implicants = nextGen;
   }
-  
+
   // Add remaining
   implicants.filter(imp => !imp.used).forEach(imp => primeImplicants.push(imp));
-  
+
   // Petrick's method (simplified) — greedy essential PI selection
   const essentialPIs: Implicant[] = [];
   const covered = new Set<number>();
-  
+
   // Find essential PIs (cover a minterm that no other PI covers)
   for (const m of minterms) {
     const coveringPIs = primeImplicants.filter(pi => implicantCovers(pi, m, numVars));
@@ -107,11 +107,11 @@ const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number
       coveringPIs[0].minterms.forEach(mt => { if (minterms.includes(mt)) covered.add(mt); });
     }
   }
-  
+
   // Greedy cover remaining
   const remaining = minterms.filter(m => !covered.has(m));
   const selectedPIs = [...essentialPIs];
-  
+
   for (const m of remaining) {
     if (covered.has(m)) continue;
     // Pick PI that covers most uncovered minterms
@@ -127,7 +127,7 @@ const quineMcCluskey = (minterms: number[], dontCares: number[], numVars: number
       minterms.filter(mt => implicantCovers(bestPI!, mt, numVars)).forEach(mt => covered.add(mt));
     }
   }
-  
+
   return selectedPIs;
 };
 
@@ -178,7 +178,7 @@ const KMapSolver = () => {
   const toggleCell = (idx: number) => {
     setCells((prev) => {
       const next = [...prev];
-      next[idx] = next[idx] === 1 ? 0 : next[idx] === 0 ? 2 : 0; // 0, 1, don't care (2)
+      next[idx] = next[idx] === 0 ? 1 : next[idx] === 1 ? 2 : 0; // 0, 1, don't care (2)
       return next;
     });
   };
@@ -316,6 +316,23 @@ const KMapSolver = () => {
     }).join(" + ");
   }, [minterms, vars, varNames, totalCells]);
 
+  const verilogCode = useMemo(() => {
+    if (minimizedResult.sop === "0") return "assign F = 1'b0;";
+    if (minimizedResult.sop === "1") return "assign F = 1'b1;";
+
+    const terms = minimizedResult.pis.map(pi => {
+      const parts: string[] = [];
+      for (let i = 0; i < pi.bits.length; i++) {
+        if (pi.bits[i] === -1) continue;
+        parts.push(pi.bits[i] === 1 ? varNames[i] : `~${varNames[i]}`);
+      }
+      return parts.length === 0 ? "1'b1" : parts.length === 1 ? parts[0] : `(${parts.join(" & ")})`;
+    });
+
+    const inputList = varNames.join(", ");
+    return `module KMapLogic(${inputList}, F);\n  input ${inputList};\n  output F;\n\n  assign F = ${terms.join(" | ")};\nendmodule`;
+  }, [minimizedResult.pis, varNames, minimizedResult.sop]);
+
   const clearAll = () => setCells(Array(16).fill(0));
   const fillAll = () => setCells(Array(16).fill(1));
 
@@ -341,11 +358,11 @@ const KMapSolver = () => {
         {/* K-Map Grid */}
         <div className="p-6 rounded-xl bg-card border border-border oscilloscope-border">
           <div className="text-xs font-mono text-muted-foreground mb-4">KARNAUGH MAP — Click cells (0 → 1 → X → 0)</div>
-          
+
           <div className="flex flex-col items-center gap-1">
             {/* Column header label */}
             <div className="text-xs font-mono text-chart-2 mb-1">{colVars}</div>
-            
+
             {/* Column headers */}
             <div className="flex gap-1 ml-12">
               {colGray.slice(0, cols).map((g) => (
@@ -374,9 +391,9 @@ const KMapSolver = () => {
                       className={cn(
                         "w-14 h-14 rounded-md border flex flex-col items-center justify-center font-mono transition-all relative",
                         val === 1 && groupIdx !== undefined ? groupColor :
-                        val === 1 ? "bg-primary/15 border-primary/40 text-primary" :
-                        val === 2 ? "bg-accent/15 border-accent/40 text-accent" :
-                        "bg-muted/50 border-border text-muted-foreground hover:border-chart-2/30"
+                          val === 1 ? "bg-primary/15 border-primary/40 text-primary" :
+                            val === 2 ? "bg-accent/15 border-accent/40 text-accent" :
+                              "bg-muted/50 border-border text-muted-foreground hover:border-chart-2/30"
                       )}>
                       <span className="text-lg font-bold">{val === 2 ? "X" : val}</span>
                       <span className="text-[8px] absolute bottom-0.5 right-1 text-muted-foreground/50">m{mintermNum}</span>
@@ -441,41 +458,91 @@ const KMapSolver = () => {
               })()}
             </div>
           </div>
+
+          {/* Verilog Code Generator */}
+          <div className="p-5 rounded-xl bg-[#001f3f] border border-border shadow-inner relative overflow-hidden">
+            <div className="text-xs font-mono text-cyan-400 mb-2 font-bold flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" /> VERILOG GENERATOR
+            </div>
+            <pre className="text-[11px] font-mono text-gray-100 whitespace-pre-wrap leading-relaxed">
+              {verilogCode}
+            </pre>
+          </div>
         </div>
       </div>
 
-      {/* Step-by-step minimization */}
-      {minimizedResult.steps.length > 0 && (
-        <div className="p-5 rounded-xl bg-card border border-border">
-          <div className="text-xs font-mono text-primary mb-3 font-bold">QUINE-McCLUSKEY STEP-BY-STEP</div>
-          <div className="space-y-1">
-            {minimizedResult.steps.map((step, i) => (
-              <div key={i} className={cn(
-                "text-xs font-mono py-0.5",
-                step.startsWith("Step") ? "text-chart-2 font-bold" :
-                step.startsWith("Result") ? "text-primary font-bold mt-2" :
-                step.startsWith("  ") ? "text-muted-foreground pl-4 border-l-2 border-border" :
-                "text-muted-foreground"
-              )}>
-                {step}
-              </div>
-            ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Truth Table view */}
+        <div className="p-5 rounded-xl bg-card border border-border h-full max-h-[400px] flex flex-col">
+          <div className="text-xs font-mono text-muted-foreground mb-3 font-bold sticky top-0">TRUTH TABLE</div>
+          <div className="overflow-y-auto flex-1 pr-2">
+            <table className="w-full text-xs text-left font-mono">
+              <thead className="bg-muted/50 sticky top-0 z-10 backdrop-blur-sm">
+                <tr>
+                  <th className="px-3 py-2 text-muted-foreground">m</th>
+                  {varNames.map(v => <th key={v} className="px-3 py-2">{v}</th>)}
+                  <th className="px-3 py-2 text-chart-2 border-l border-border/50">F</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: totalCells }).map((_, i) => {
+                  const groupIdx = cellGroups.get(i);
+                  const val = cells[i];
+                  return (
+                    <tr key={i} className={cn("border-b border-border/30 hover:bg-muted/30 transition-colors", groupIdx !== undefined && val === 1 && "bg-primary/5")}>
+                      <td className="px-3 py-1.5 text-muted-foreground/50">{i}</td>
+                      {varNames.map((_, vIdx) => (
+                        <td key={vIdx} className="px-3 py-1.5 text-muted-foreground">
+                          {(i >> (vars - 1 - vIdx)) & 1}
+                        </td>
+                      ))}
+                      <td className={cn(
+                        "px-3 py-1.5 font-bold border-l border-border/50",
+                        val === 1 ? "text-primary" : val === 2 ? "text-accent" : "text-muted-foreground/30"
+                      )}>
+                        {val === 1 ? "1" : val === 2 ? "X" : "0"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
 
-      {/* How to simplify */}
-      <div className="p-4 rounded-xl bg-card border border-border">
-        <div className="text-xs font-mono text-muted-foreground mb-2">K-MAP SIMPLIFICATION RULES</div>
-        <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
-          <li>Group adjacent 1s in powers of 2 (1, 2, 4, 8)</li>
-          <li>Larger groups = fewer variables in product term</li>
-          <li>Groups can wrap around edges (K-map is toroidal)</li>
-          <li>Don't-cares (X) can be included in groups if helpful</li>
-          <li>Each 1 must be in at least one group</li>
-          <li>Write product term: variable absent if it changes in group</li>
-          <li><span className="text-chart-2">GATE tip:</span> Group of 2^k eliminates k variables from term</li>
-        </ol>
+        {/* Step-by-step minimization */}
+        {minimizedResult.steps.length > 0 && (
+          <div className="p-5 rounded-xl bg-card border border-border">
+            <div className="text-xs font-mono text-primary mb-3 font-bold">QUINE-McCLUSKEY STEP-BY-STEP</div>
+            <div className="space-y-1">
+              {minimizedResult.steps.map((step, i) => (
+                <div key={i} className={cn(
+                  "text-xs font-mono py-0.5",
+                  step.startsWith("Step") ? "text-chart-2 font-bold" :
+                    step.startsWith("Result") ? "text-primary font-bold mt-2" :
+                      step.startsWith("  ") ? "text-muted-foreground pl-4 border-l-2 border-border" :
+                        "text-muted-foreground"
+                )}>
+                  {step}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* How to simplify */}
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <div className="text-xs font-mono text-muted-foreground mb-2">K-MAP SIMPLIFICATION RULES</div>
+          <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
+            <li>Group adjacent 1s in powers of 2 (1, 2, 4, 8)</li>
+            <li>Larger groups = fewer variables in product term</li>
+            <li>Groups can wrap around edges (K-map is toroidal)</li>
+            <li>Don't-cares (X) can be included in groups if helpful</li>
+            <li>Each 1 must be in at least one group</li>
+            <li>Write product term: variable absent if it changes in group</li>
+            <li><span className="text-chart-2">GATE tip:</span> Group of 2^k eliminates k variables from term</li>
+          </ol>
+        </div>
       </div>
     </div>
   );

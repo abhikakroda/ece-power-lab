@@ -98,19 +98,44 @@ const ProtocolAnalyzer = () => {
 
   useEffect(() => { reset(); }, [protocol, reset]);
 
-  const svgW = 600, svgH = Math.max(200, totalSteps * 45 + 60);
+  const svgW = 600, svgH = totalSteps * 45 + 60;
   const clientX = 100, serverX = 500, broadcastX = 300;
 
   const getX = (who: string) => who === "client" ? clientX : who === "server" ? serverX : broadcastX;
 
-  // Fake packet hex dump
-  const getHexDump = (s: Step) => {
-    const lines = [
-      "0000   45 00 00 3c 1c 46 40 00 40 06 b1 e6 c0 a8 01 0a",
-      `0010   c0 a8 01 01 ${s.flags?.includes("SYN") ? "c0 12" : "00 50"} 00 50 00 00 00 64`,
-      `0020   00 00 01 2c ${s.flags?.includes("SYN") ? "a0 02" : "50 18"} ff ff ${s.flags?.includes("FIN") ? "00 01" : "b8 40"} 00 00`,
-    ];
-    return lines;
+  // Realistic packet hex dump per protocol
+  const getHexDump = (s: Step, p: Protocol) => {
+    if (p === "tcp") {
+      return [
+        "0000   45 00 00 3c 1c 46 40 00 40 06 b1 e6 c0 a8 01 0a",
+        `0010   c0 a8 01 01 ${s.flags?.includes("SYN") ? "c0 12" : "00 50"} 00 50 00 00 00 64`,
+        `0020   00 00 01 2c ${s.flags?.includes("SYN") ? "a0 02" : "50 18"} ff ff ${s.flags?.includes("FIN") ? "00 01" : "b8 40"} 00 00`,
+      ];
+    } else if (p === "udp") {
+      return [
+        "0000   45 00 00 3c 1c 46 40 00 40 11 b1 d5 c0 a8 01 0a",
+        "0010   08 08 08 08 c0 00 00 35 00 28 8a 4b 12 34 01 00",
+        "0020   00 01 00 00 00 00 00 00 07 65 78 61 6d 70 6c 65",
+      ];
+    } else if (p === "arp") {
+      return [
+        "0000   ff ff ff ff ff ff 11 22 33 44 55 66 08 06 00 01",
+        "0010   08 00 06 04 00 01 11 22 33 44 55 66 c0 a8 01 0a",
+        "0020   00 00 00 00 00 00 c0 a8 01 01 00 00 00 00 00 00",
+      ];
+    } else if (p === "dhcp") {
+      return [
+        "0000   ff ff ff ff ff ff 11 22 33 44 55 66 08 00 45 00",
+        "0010   01 48 00 00 00 00 80 11 39 96 00 00 00 00 ff ff",
+        "0020   ff ff 00 44 00 43 01 34 a1 b2 01 01 06 00 11 22",
+      ];
+    } else { // dns
+      return [
+        "0000   45 00 00 3c 1c 46 40 00 40 11 b1 d5 c0 a8 01 0a",
+        "0010   08 08 08 08 c0 00 00 35 00 28 8a 4b 12 34 01 00",
+        "0020   00 01 00 00 00 00 00 00 07 65 78 61 6d 70 6c 65",
+      ];
+    }
   };
 
   return (
@@ -136,6 +161,10 @@ const ProtocolAnalyzer = () => {
           {isPlaying ? <Pause size={14} /> : <Play size={14} />}
           {step === -1 ? "Start" : isPlaying ? "Pause" : "Resume"}
         </button>
+        <button onClick={() => setStep(s => Math.max(s - 1, -1))}
+          className="px-3 py-2 rounded-lg text-xs font-mono border border-border text-muted-foreground hover:text-foreground" disabled={step <= -1}>
+          ← Step
+        </button>
         <button onClick={() => setStep(s => Math.min(s + 1, totalSteps - 1))}
           className="px-3 py-2 rounded-lg text-xs font-mono border border-border text-muted-foreground hover:text-foreground" disabled={step >= totalSteps - 1}>
           Step →
@@ -159,7 +188,7 @@ const ProtocolAnalyzer = () => {
 
       {/* Message Sequence Chart */}
       <div className="p-5 rounded-xl bg-card border border-border oscilloscope-border overflow-x-auto">
-        <svg width="100%" viewBox={`0 0 ${svgW} ${svgH}`} style={{ minHeight: 300 }}>
+        <svg width="100%" viewBox={`0 0 ${svgW} ${svgH}`} style={{ height: "auto", minHeight: Math.max(200, svgH) }}>
           {/* Lifelines */}
           <rect x={clientX - 30} y="5" width="60" height="22" rx="4" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary) / 0.4)" strokeWidth="1" />
           <text x={clientX} y="20" textAnchor="middle" fontSize="9" fill="hsl(var(--primary))" fontFamily="monospace" fontWeight="bold">CLIENT</text>
@@ -246,7 +275,7 @@ const ProtocolAnalyzer = () => {
           {showPacketBytes && (
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="text-[9px] font-mono text-muted-foreground mb-1">PACKET HEX DUMP</div>
-              {getHexDump(proto.steps[step]).map((line, i) => (
+              {getHexDump(proto.steps[step], protocol).map((line, i) => (
                 <div key={i} className="text-[10px] font-mono text-chart-3">{line}</div>
               ))}
             </div>

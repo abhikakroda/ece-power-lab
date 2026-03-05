@@ -61,6 +61,9 @@ const subjects: Subject[] = [
       { name: "Parseval's Theorem", formula: "∫|x(t)|² dt = (1/2π)∫|X(ω)|² dω", latex: "\\int_{-\\infty}^{\\infty} |x(t)|^2 \\, dt = \\frac{1}{2\\pi} \\int_{-\\infty}^{\\infty} |X(\\omega)|^2 \\, d\\omega", used: "Energy calculation in both domains", trick: "Energy is conserved between time and frequency" },
       { name: "DFT", formula: "X[k] = Σ x[n]·e^(-j2πkn/N)", latex: "X[k] = \\sum_{n=0}^{N-1} x[n] \\cdot e^{-j2\\pi kn/N}, \\quad k=0,1,\\ldots,N-1", used: "Spectral analysis of discrete signals, FFT basis", mistake: "DFT assumes periodicity — windowing needed for non-periodic signals", trick: "FFT computes DFT in O(N log N) vs O(N²)" },
       { name: "Transfer Function (Discrete)", formula: "H(z) = Y(z)/X(z)", latex: "H(z) = \\frac{Y(z)}{X(z)} = \\frac{\\sum b_k z^{-k}}{\\sum a_k z^{-k}}", used: "Digital filter design (IIR/FIR)", trick: "FIR: all poles at origin. IIR: poles anywhere inside unit circle for stability" },
+      { name: "Fast Fourier Transform (Radix-2)", formula: "X[k] = E[k] + WN^k * O[k]", latex: "X[k] = E[k] + e^{-j\\frac{2\\pi}{N}k} O[k]", used: "Efficient computation of DFT", trick: "Reduces O(N^2) complexity of DFT to O(N log N)" },
+      { name: "Gibbs Phenomenon", formula: "9% overshoot", latex: "\\text{Peak Overshoot} \\approx 8.95\\text{\\% of jump}", used: "Fourier series of discontinuities", mistake: "Increasing terms N does not eliminate the overshoot, it only compresses it towards the discontinuity", trick: "Use windowing functions (Hamming, Hanning) to mitigate" },
+      { name: "Parseval's Relation for DFT", formula: "Σ |x[n]|^2 = (1/N) Σ |X[k]|^2", latex: "\\sum_{n=0}^{N-1} |x[n]|^2 = \\frac{1}{N} \\sum_{k=0}^{N-1} |X[k]|^2", used: "Energy conservation in discrete domain", trick: "Total energy in time domain equals total energy in frequency domain" }
     ],
   },
   {
@@ -144,6 +147,9 @@ const subjects: Subject[] = [
       { name: "Time Constant", formula: "τ = RC or L/R", latex: "\\tau = RC \\text{ (RC circuit)}, \\quad \\tau = \\frac{L}{R} \\text{ (RL circuit)}", used: "Transient response", trick: "After 5τ, circuit reaches ~99.3% of final value" },
       { name: "Resonant Frequency", formula: "f₀ = 1/(2π√LC)", latex: "f_0 = \\frac{1}{2\\pi\\sqrt{LC}}, \\quad Q = \\frac{f_0}{BW} = \\frac{1}{R}\\sqrt{\\frac{L}{C}}", used: "Filter design, oscillators, tuning circuits", mistake: "Series RLC: impedance minimum at resonance. Parallel: impedance maximum", trick: "Higher Q = sharper selectivity = narrower bandwidth" },
       { name: "Superposition", formula: "Response = Σ individual source responses", latex: "V_{total} = \\sum_k V_k \\text{ (with one source active at a time)}", used: "Multi-source linear circuit analysis", mistake: "Turn off voltage sources = short. Turn off current sources = open", trick: "Only works for linear circuits. Power cannot be superposed!" },
+      { name: "Star-Delta Transformation", formula: "R1 = (Rab·Rca)/(Rab+Rbc+Rca)", latex: "R_1 = \\frac{R_{ab}R_{ca}}{R_{ab}+R_{bc}+R_{ca}}", used: "Simplifying bridge networks", trick: "Star resistor = (product of adjacent Delta resistors) / (sum of all Delta resistors)" },
+      { name: "Two-Port Z-Parameters", formula: "V1 = Z11·I1 + Z12·I2", latex: "\\begin{bmatrix} V_1 \\\\ V_2 \\end{bmatrix} = \\begin{bmatrix} Z_{11} & Z_{12} \\\\ Z_{21} & Z_{22} \\end{bmatrix} \\begin{bmatrix} I_1 \\\\ I_2 \\end{bmatrix}", used: "Open-circuit impedance network analysis", trick: "Reciprocal if Z12 = Z21. Symmetrical if Z11 = Z22" },
+      { name: "Two-Port h-Parameters", formula: "V1 = h11·I1 + h12·V2", latex: "\\begin{bmatrix} V_1 \\\\ I_2 \\end{bmatrix} = \\begin{bmatrix} h_{11} & h_{12} \\\\ h_{21} & h_{22} \\end{bmatrix} \\begin{bmatrix} I_1 \\\\ V_2 \\end{bmatrix}", used: "BJT transistor modeling", trick: "Hybrid: mixture of open and short circuit parameters" }
     ],
   },
   {
@@ -168,8 +174,19 @@ const subjects: Subject[] = [
       { name: "Pipeline Speedup", formula: "S = n·k / (k + n - 1)", latex: "S = \\frac{n \\cdot k}{k + (n-1)}", where: "n = # instructions, k = # pipeline stages", used: "Pipeline efficiency", trick: "As n → ∞, S → k (ideal). Hazards reduce actual speedup" },
       { name: "Memory Address Bits", formula: "Address bits = log₂(memory size)", latex: "\\text{Address bits} = \\log_2(\\text{Memory size in bytes})", used: "Memory system design", trick: "4GB → 32 bits. 64KB → 16 bits. Cache: tag + index + offset" },
       { name: "DMA Transfer Time", formula: "T = N × (Tbus + Tmem)", latex: "T_{DMA} = \\frac{N \\times \\text{word\\_size}}{\\text{bus\\_bandwidth}}", used: "I/O performance analysis", trick: "DMA frees CPU during bulk transfers. Interrupt only at completion" },
+      { name: "Cache Mapping (Direct)", formula: "Block Address % Cache Blocks", latex: "\\text{Index} = (\\text{Block Address}) \\bmod (\\text{Number of Blocks in Cache})", used: "Cache memory organization", mistake: "High conflict miss rate if multiple accessed blocks map to same index", trick: "Fully associative has no index, only tag and offset" }
     ],
   },
+  {
+    id: "semiconductor",
+    name: "Semiconductor Physics",
+    formulas: [
+      { name: "Mass Action Law", formula: "n·p = ni²", latex: "n \\cdot p = n_i^2", used: "Carrier concentration calculations", trick: "Valid in thermal equilibrium. Doping with ND primarily increases n, decreasing p." },
+      { name: "Conductivity", formula: "σ = q(n·μn + p·μp)", latex: "\\sigma = q(n\\mu_n + p\\mu_p)", used: "Resistivity and sheet resistance", mistake: "Mobility (μ) decreases with higher doping due to impurity scattering", trick: "In N-type, σ ≈ q·ND·μn" },
+      { name: "Built-in Potential (PN)", formula: "V0 = VT·ln(NaNd/ni²)", latex: "V_0 = V_T \\ln\\left(\\frac{N_A N_D}{n_i^2}\\right)", where: "VT = kT/q ≈ 26mV at 300K", used: "Diode junction analysis", trick: "Cannot be measured with a voltmeter!" },
+      { name: "Depletion Width", formula: "W = √[2ε/q(1/Na+1/Nd)(V0-VD)]", latex: "W = \\sqrt{\\frac{2\\varepsilon}{q}\\left(\\frac{1}{N_A}+\\frac{1}{N_D}\\right)(V_0 - V_D)}", used: "Junction capacitance, breakdown voltage", trick: "Wider on the lightly doped side" }
+    ]
+  }
 ];
 
 const FormulaEngine = () => {
@@ -181,10 +198,10 @@ const FormulaEngine = () => {
 
   const filteredFormulas = searchQuery.trim()
     ? currentSubject.formulas.filter(f =>
-        f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.formula.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.used.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.formula.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.used.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : currentSubject.formulas;
 
   return (
@@ -235,13 +252,13 @@ const FormulaEngine = () => {
                 onClick={() => setExpandedFormula(isExpanded ? null : f.name)}
                 className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/40 transition-colors"
               >
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pr-4">
                   <div className="text-sm font-medium text-foreground">{f.name}</div>
-                  <div className="mt-1 overflow-x-auto">
+                  <div className="mt-2 w-full text-foreground/80 font-serif">
                     <KaTeXInline latex={f.latex} />
                   </div>
                 </div>
-                {isExpanded ? <ChevronDown size={16} className="text-muted-foreground shrink-0 ml-3" /> : <ChevronRight size={16} className="text-muted-foreground shrink-0 ml-3" />}
+                {isExpanded ? <ChevronDown size={16} className="text-muted-foreground shrink-0" /> : <ChevronRight size={16} className="text-muted-foreground shrink-0" />}
               </button>
               {isExpanded && (
                 <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">

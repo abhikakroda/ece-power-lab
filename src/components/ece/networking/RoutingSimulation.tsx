@@ -16,6 +16,7 @@ interface Link {
   cost: number;
   bandwidth: number; // Mbps
   congestion: number; // 0-1
+  up?: boolean;
 }
 
 const nodes: Node[] = [
@@ -44,6 +45,7 @@ type Protocol = "static" | "rip" | "ospf";
 const dijkstra = (links: Link[], src: string, dst: string): { path: string[]; cost: number } => {
   const adj: Record<string, { to: string; cost: number }[]> = {};
   for (const l of links) {
+    if (l.up === false) continue;
     if (!adj[l.from]) adj[l.from] = [];
     if (!adj[l.to]) adj[l.to] = [];
     adj[l.from].push({ to: l.to, cost: l.cost });
@@ -88,6 +90,7 @@ const dijkstra = (links: Link[], src: string, dst: string): { path: string[]; co
 const ripRoute = (links: Link[], src: string, dst: string): { path: string[]; hops: number } => {
   const adj: Record<string, string[]> = {};
   for (const l of links) {
+    if (l.up === false) continue;
     if (!adj[l.from]) adj[l.from] = [];
     if (!adj[l.to]) adj[l.to] = [];
     adj[l.from].push(l.to);
@@ -188,6 +191,13 @@ const RoutingSimulation = () => {
         (l.from === from && l.to === to) || (l.to === from && l.from === to)
       );
 
+      if (!link || link.up === false) {
+        setIsAnimating(false);
+        setDroppedPackets(p => p + 1);
+        addLog(`❌ Packet DROPPED on ${from}→${to} (Link is DOWN)`);
+        return;
+      }
+
       if (link && link.congestion > 0.8 && Math.random() < link.congestion * 0.4) {
         setIsAnimating(false);
         setDroppedPackets(p => p + 1);
@@ -214,7 +224,7 @@ const RoutingSimulation = () => {
   const isOnPath = (from: string, to: string) => {
     for (let i = 0; i < activePath.length - 1; i++) {
       if ((activePath[i] === from && activePath[i + 1] === to) ||
-          (activePath[i] === to && activePath[i + 1] === from)) return true;
+        (activePath[i] === to && activePath[i + 1] === from)) return true;
     }
     return false;
   };
@@ -286,33 +296,45 @@ const RoutingSimulation = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Network Topology SVG */}
         <div className="lg:col-span-2 p-4 rounded-xl bg-card border border-border oscilloscope-border">
-          <div className="text-[10px] font-mono text-muted-foreground mb-2 uppercase tracking-wider">Network Topology</div>
+          <div className="text-[10px] font-mono text-muted-foreground mb-2 uppercase tracking-wider">Network Topology (Click Links to Sever)</div>
           <svg viewBox="0 0 640 220" className="w-full" style={{ minHeight: 200 }}>
             {/* Links */}
             {currentLinks.map((link, i) => {
               const from = getNodePos(link.from);
               const to = getNodePos(link.to);
               const onPath = isOnPath(link.from, link.to);
-              const congColor = link.congestion > 0.6 ? "hsl(var(--destructive))" :
-                               link.congestion > 0.3 ? "hsl(var(--chart-3))" :
-                               "hsl(var(--muted-foreground))";
+              const isDown = link.up === false;
+              const congColor = isDown ? "hsl(var(--destructive))" : link.congestion > 0.6 ? "hsl(var(--destructive))" :
+                link.congestion > 0.3 ? "hsl(var(--chart-3))" :
+                  "hsl(var(--muted-foreground))";
               return (
-                <g key={i}>
+                <g key={i} onClick={() => setLinks(lns => lns.map((l, idx) => idx === i ? { ...l, up: l.up === false ? true : false } : l))} className="cursor-pointer">
+                  {/* Invisible wider line for easier clicking */}
+                  <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="transparent" strokeWidth="15" />
                   <line x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                    stroke={onPath ? "hsl(var(--primary))" : congColor}
-                    strokeWidth={onPath ? 3 : 1.5}
-                    strokeDasharray={onPath ? "0" : "4 4"}
-                    opacity={onPath ? 1 : 0.5}
+                    stroke={onPath && !isDown ? "hsl(var(--primary))" : congColor}
+                    strokeWidth={onPath && !isDown ? 3 : isDown ? 2 : 1.5}
+                    strokeDasharray={isDown ? "4 4" : onPath ? "0" : "4 4"}
+                    opacity={isDown ? 0.2 : onPath ? 1 : 0.5}
                   />
                   {/* Cost label */}
-                  <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 8}
-                    textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize={9} fontFamily="monospace">
-                    c={link.cost}
-                  </text>
+                  {!isDown && (
+                    <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 8}
+                      textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="9" fontFamily="monospace">
+                      c={link.cost}
+                    </text>
+                  )}
+                  {/* Broken indicator */}
+                  {isDown && (
+                    <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 + 4}
+                      textAnchor="middle" fill="hsl(var(--destructive))" fontSize="14" fontWeight="bold" opacity="0.8">
+                      ×
+                    </text>
+                  )}
                   {/* Congestion indicator */}
-                  {link.congestion > 0.5 && (
+                  {!isDown && link.congestion > 0.5 && (
                     <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 + 12}
-                      textAnchor="middle" fill="hsl(var(--destructive))" fontSize={8} fontFamily="monospace">
+                      textAnchor="middle" fill="hsl(var(--destructive))" fontSize="8" fontFamily="monospace">
                       {(link.congestion * 100).toFixed(0)}%
                     </text>
                   )}
@@ -339,13 +361,13 @@ const RoutingSimulation = () => {
                   )}
                   <circle cx={node.x} cy={node.y} r={16}
                     fill={isPacketHere ? "hsl(var(--chart-3))" :
-                          isSource ? "hsl(var(--primary))" :
-                          isDest ? "hsl(var(--chart-3))" :
+                      isSource ? "hsl(var(--primary))" :
+                        isDest ? "hsl(var(--chart-3))" :
                           isOnRoute ? "hsl(var(--primary) / 0.3)" :
-                          "hsl(var(--muted))"}
+                            "hsl(var(--muted))"}
                     stroke={isSource ? "hsl(var(--primary))" :
-                            isDest ? "hsl(var(--chart-3))" :
-                            "hsl(var(--border))"}
+                      isDest ? "hsl(var(--chart-3))" :
+                        "hsl(var(--border))"}
                     strokeWidth={isSource || isDest ? 2 : 1}
                   />
                   <text x={node.x} y={node.y + 4} textAnchor="middle"
@@ -396,15 +418,15 @@ const RoutingSimulation = () => {
             <div className="space-y-0.5">
               {nodes.filter(n => n.id !== source).map(n => {
                 const r = protocol === "ospf" ? dijkstra(currentLinks, source, n.id) :
-                          protocol === "rip" ? ripRoute(currentLinks, source, n.id) :
-                          { path: staticRoutes[`${source}-${n.id}`] || [source, n.id], cost: 0 };
+                  protocol === "rip" ? ripRoute(currentLinks, source, n.id) :
+                    { path: staticRoutes[`${source}-${n.id}`] || [source, n.id], cost: 0 };
                 const path = r.path;
                 const nextHop = path.length > 1 ? path[1] : "—";
                 return (
                   <div key={n.id} className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground py-0.5">
                     <span className="w-8 text-foreground">{n.id}</span>
-                    <span className="flex-1">→ {nextHop}</span>
-                    <span className="text-primary">{protocol === "rip" ? `${path.length - 1}hop` : `c=${('cost' in r ? r.cost : 0)}`}</span>
+                    <span className={cn("flex-1", path.length > 0 ? "" : "text-destructive/70 italic")}>→ {path.length > 0 ? nextHop : "unreachable"}</span>
+                    <span className="text-primary">{path.length > 0 ? (protocol === "rip" ? `${path.length - 1}hop` : `c=${('cost' in r ? r.cost : 0)}`) : "—"}</span>
                   </div>
                 );
               })}

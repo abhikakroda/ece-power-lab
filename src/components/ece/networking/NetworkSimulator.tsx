@@ -21,6 +21,7 @@ interface Connection {
   delay: number; // ms
   loss: number; // %
   jitter: number; // ms
+  up?: boolean; // Link status
 }
 
 interface Packet {
@@ -129,26 +130,56 @@ const NetworkSimulator = () => {
     setLog(prev => [...prev.slice(-30), `[${new Date().toLocaleTimeString()}] ${msg}`]);
   }, []);
 
-  // BFS path finding
+  // Dijkstra path finding based on link properties
   const findPath = useCallback((src: string, dst: string): string[] => {
-    const adj: Record<string, string[]> = {};
+    const adj: Record<string, { to: string; cost: number; up: boolean }[]> = {};
     for (const c of connections) {
       if (!adj[c.from]) adj[c.from] = [];
       if (!adj[c.to]) adj[c.to] = [];
-      adj[c.from].push(c.to);
-      adj[c.to].push(c.from);
+      // Cost metric: combining delay and inversely proportional bandwidth
+      const cost = c.delay + (10000 / Math.max(c.bandwidth, 1));
+      const up = c.up !== false;
+      adj[c.from].push({ to: c.to, cost, up });
+      adj[c.to].push({ to: c.from, cost, up });
     }
-    const queue: string[][] = [[src]];
-    const visited = new Set([src]);
-    while (queue.length) {
-      const path = queue.shift()!;
-      if (path[path.length - 1] === dst) return path;
-      for (const n of (adj[path[path.length - 1]] || [])) {
-        if (!visited.has(n)) { visited.add(n); queue.push([...path, n]); }
+
+    const dist: Record<string, number> = {};
+    const prev: Record<string, string | null> = {};
+    const visited = new Set<string>();
+
+    for (const d of devices) { dist[d.id] = Infinity; prev[d.id] = null; }
+    dist[src] = 0;
+
+    let u: string | null = null;
+    while (true) {
+      u = null;
+      let minD = Infinity;
+      for (const d of devices) {
+        if (!visited.has(d.id) && dist[d.id] < minD) {
+          minD = dist[d.id];
+          u = d.id;
+        }
+      }
+      if (!u || u === dst || minD === Infinity) break;
+      visited.add(u);
+
+      for (const edge of (adj[u] || [])) {
+        if (!edge.up) continue;
+        const alt = dist[u] + edge.cost;
+        if (alt < dist[edge.to]) {
+          dist[edge.to] = alt;
+          prev[edge.to] = u;
+        }
       }
     }
-    return [];
-  }, [connections]);
+
+    const path: string[] = [];
+    let cur: string | null = dst;
+    if (prev[cur] !== null || cur === src) {
+      while (cur) { path.unshift(cur); cur = prev[cur]; }
+    }
+    return path.length > 0 && path[0] === src ? path : [];
+  }, [connections, devices]);
 
   const getLink = useCallback((a: string, b: string) => {
     return connections.find(c => (c.from === a && c.to === b) || (c.from === b && c.to === a));
@@ -209,10 +240,11 @@ const NetworkSimulator = () => {
         const to = pkt.path[pkt.currentHop + 1];
         const link = getLink(from, to);
 
-        // Packet loss
-        if (link && Math.random() * 100 < link.loss) {
+        // Packet loss or link down
+        if (!link || link.up === false || Math.random() * 100 < link.loss) {
           setStats(s => ({ ...s, dropped: s.dropped + 1 }));
-          addLog(`❌ Packet #${pkt.id} dropped on ${from}→${to} (${link.loss}% loss)`);
+          const reason = (!link || link.up === false) ? "link down" : `${link.loss}% loss`;
+          addLog(`❌ Packet #${pkt.id} dropped on ${from}→${to} (${reason})`);
           return { ...pkt, status: "dropped" as const };
         }
 
@@ -374,14 +406,15 @@ const NetworkSimulator = () => {
 
               const isActive = packets.some(p => p.status === "transit" && p.path.includes(conn.from) && p.path.includes(conn.to));
               const isSel = selectedConn === conn.id;
+              const isDown = conn.up === false;
 
               return (
                 <g key={conn.id} onClick={() => setSelectedConn(conn.id === selectedConn ? null : conn.id)} className="cursor-pointer">
                   <line x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                    stroke={isSel ? "hsl(var(--primary))" : isActive ? "hsl(var(--chart-3))" : "hsl(var(--muted-foreground))"}
+                    stroke={isDown ? "hsl(var(--destructive))" : isSel ? "hsl(var(--primary))" : isActive ? "hsl(var(--chart-3))" : "hsl(var(--muted-foreground))"}
                     strokeWidth={isSel ? 3 : isActive ? 2.5 : 1.5}
-                    opacity={isActive ? 1 : 0.4}
-                    strokeDasharray={isActive ? "0" : "4 4"} />
+                    opacity={isDown ? 0.3 : isActive ? 1 : 0.4}
+                    strokeDasharray={isDown ? "2 6" : isActive ? "0" : "4 4"} />
                   {/* Link info */}
                   <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 8} textAnchor="middle"
                     fontSize="7" fill="hsl(var(--muted-foreground))" fontFamily="monospace">
@@ -414,13 +447,13 @@ const NetworkSimulator = () => {
                   {/* Device body */}
                   <rect x={dev.x - 22} y={dev.y - 18} width="44" height="36" rx="6"
                     fill={isSel ? "hsl(var(--primary) / 0.2)" :
-                          isSrc ? "hsl(var(--chart-3) / 0.15)" :
-                          isDst ? "hsl(var(--chart-4) / 0.15)" :
+                      isSrc ? "hsl(var(--chart-3) / 0.15)" :
+                        isDst ? "hsl(var(--chart-4) / 0.15)" :
                           "hsl(var(--muted) / 0.8)"}
                     stroke={isSel ? "hsl(var(--primary))" :
-                            isSrc ? "hsl(var(--chart-3))" :
-                            isDst ? "hsl(var(--chart-4))" :
-                            "hsl(var(--border))"}
+                      isSrc ? "hsl(var(--chart-3))" :
+                        isDst ? "hsl(var(--chart-4))" :
+                          "hsl(var(--border))"}
                     strokeWidth={isSel || isSrc || isDst ? 2 : 1} />
                   <text x={dev.x} y={dev.y + 2} textAnchor="middle" fontSize="16">{deviceIcons[dev.type]}</text>
                   <text x={dev.x} y={dev.y + 30} textAnchor="middle" fontSize="8" fill="hsl(var(--foreground))" fontFamily="monospace" fontWeight="bold">
@@ -470,8 +503,18 @@ const NetworkSimulator = () => {
 
           {editingConn && (
             <div className="p-4 rounded-xl bg-card border border-primary/30 space-y-2">
-              <div className="text-[10px] font-mono text-primary uppercase tracking-wider">
+              <div className="text-[10px] font-mono text-primary uppercase tracking-wider mb-2">
                 Link: {editingConn.from} ↔ {editingConn.to}
+              </div>
+              <div className="flex items-center gap-2 pb-1">
+                <label className="text-[8px] text-muted-foreground font-mono">STATUS</label>
+                <button
+                  onClick={() => setConnections(conns => conns.map(c => c.id === selectedConn ? { ...c, up: c.up === false ? true : false } : c))}
+                  className={cn("px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all",
+                    editingConn.up !== false ? "bg-primary/20 text-primary border border-primary/30" : "bg-destructive/20 text-destructive border border-destructive/30"
+                  )}>
+                  {editingConn.up !== false ? "UP (ACTIVE)" : "DOWN (LINK BROKEN)"}
+                </button>
               </div>
               {[
                 { label: "Bandwidth (Mbps)", key: "bandwidth" as const, min: 1, max: 10000, color: "chart-2" },
@@ -518,8 +561,8 @@ const NetworkSimulator = () => {
                 return (
                   <div key={d.id} className="flex text-[9px] font-mono text-muted-foreground gap-2">
                     <span className="text-foreground w-8">{d.id}</span>
-                    <span className="text-primary flex-1">{path.join("→") || "unreachable"}</span>
-                    <span className="text-chart-4">{path.length - 1}hop</span>
+                    <span className={cn("flex-1", path.length > 0 ? "text-primary" : "text-destructive/70 italic")}>{path.length > 0 ? path.join("→") : "unreachable"}</span>
+                    <span className="text-chart-4">{path.length > 0 ? `${path.length - 1}hop` : "—"}</span>
                   </div>
                 );
               })}
