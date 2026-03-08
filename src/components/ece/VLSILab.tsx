@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Cpu, Factory, Pencil } from "lucide-react";
+import { Cpu, Factory, Pencil, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MOSFETVisualizer from "./vlsi/MOSFETVisualizer";
 import FabricationFlow from "./vlsi/FabricationFlow";
 import MicroCADLab from "./vlsi/MicroCADLab";
+import CMOSInverterLab from "./vlsi/CMOSInverterLab";
 
-type VLSITab = "microcad" | "mosfet" | "fab";
+type VLSITab = "microcad" | "cmos" | "mosfet" | "fab";
 
 const tabs: { id: VLSITab; label: string; icon: React.ReactNode; desc: string }[] = [
   { id: "microcad", label: "MicroCAD Lab", icon: <Pencil size={16} />, desc: "MOSFET Design" },
+  { id: "cmos", label: "CMOS Inverter", icon: <Layers size={16} />, desc: "NMOS + PMOS" },
   { id: "mosfet", label: "MOSFET Physics", icon: <Cpu size={16} />, desc: "Device Sim" },
   { id: "fab", label: "Fabrication", icon: <Factory size={16} />, desc: "Flow Game" },
 ];
