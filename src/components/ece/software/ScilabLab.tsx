@@ -574,8 +574,8 @@ export default function ScilabLab() {
   // ── Workspace variable list ───────────────────────────────────────────────
   const workspaceVars = useMemo(() => Object.entries(scope).map(([k, v]) => {
     let type = typeof v, size = "scalar";
-    if (v && typeof v.size === "function") { size = v.size().join("×"); type = "matrix"; }
-    else if (Array.isArray(v)) { size = `1×${v.length}`; type = "array"; }
+    if (v && typeof v.size === "function") { size = v.size().join("×"); type = "object"; }
+    else if (Array.isArray(v)) { size = `1×${v.length}`; type = "object"; }
     return { name: k, type, size, value: math.format(v, { precision: 4 }) };
   }), [scope]);
 

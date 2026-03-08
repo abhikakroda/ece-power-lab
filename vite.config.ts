@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
+// @ts-ignore - optional dependency
+let componentTagger: any;
+try { componentTagger = (await import("lovable-tagger")).componentTagger; } catch {}
 import electron from "vite-plugin-electron";
 import renderer from "vite-plugin-electron-renderer";
 
