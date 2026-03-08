@@ -50,6 +50,7 @@ const VLSILab = () => {
 
       <div className="animate-fade-in" key={activeTab}>
         {activeTab === "microcad" && <MicroCADLab />}
+        {activeTab === "cmos" && <CMOSInverterLab />}
         {activeTab === "mosfet" && <MOSFETVisualizer />}
         {activeTab === "fab" && <FabricationFlow />}
       </div>
